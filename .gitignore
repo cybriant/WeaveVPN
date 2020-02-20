@@ -1,5 +1,6 @@
 #macOs  Files
 Frontend/.DS_Store
+.DS_Store
 
 Frontend/node_modules/
 Frontend/logs/
