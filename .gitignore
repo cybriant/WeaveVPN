@@ -1,5 +1,7 @@
 #macOs  Files
 */.DS_Store
+.DS_Store
 
+*/yarn.lock
 */node_modules/
 */logs/
