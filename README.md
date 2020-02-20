@@ -1,6 +1,10 @@
 # KSU_SDN
 
-`cd` into project
+
+
+To get the front end set up and running:
+
+Change directory to Frontend directory: `$ cd Frontend`
 
 Install dependencies: `$ yarn install`
 
