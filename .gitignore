@@ -1,5 +1,5 @@
 #macOs  Files
-../.DS_Store
+Frontend/.DS_Store
 
-../node_modules/
-../logs/
+Frontend/node_modules/
+Frontend/logs/
