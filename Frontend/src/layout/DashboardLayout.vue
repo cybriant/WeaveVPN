@@ -7,14 +7,14 @@
         style="margin-right: 15px; color: white; text-align: center; vertical-align: middle; float: left;"/>
         <p>Dashboard</p>
       </sidebar-link>
+      <sidebar-link to="/admin/network-management">
+        <i class="nc-icon nc-vector"></i>
+        <p>Network Management</p>
+      </sidebar-link>
       <sidebar-link to="/admin/user-management">
         <img src="/img/icons/multiple-11.svg" height="30px" width="30px" 
         style="margin-right: 15px; color: white; text-align: center; vertical-align: middle; float: left;"/>
         <p>User Management</p>
-      </sidebar-link>
-      <sidebar-link to="/admin/network-management">
-        <i class="nc-icon nc-vector"></i>
-        <p>Network Management</p>
       </sidebar-link>
       <sidebar-link to="/admin/settings">
         <i class="nc-icon nc-settings-gear-64"></i>
