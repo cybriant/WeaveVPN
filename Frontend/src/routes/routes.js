@@ -51,24 +51,24 @@ const routes = [
         component: UserProfile
       },
       {
-        path: 'table-list',
-        name: 'Table List',
-        component: TableList
+        path: 'user-management',
+        name: 'User Management',
+        component: UserProfile
       },
       {
-        path: 'typography',
-        name: 'Typography',
-        component: Typography
+        path: 'network-management',
+        name: 'Network Management',
+        component: UserProfile
       },
       {
-        path: 'icons',
-        name: 'Icons',
-        component: Icons
+        path: 'settings',
+        name: 'Settings',
+        component: UserProfile
       },
       {
-        path: 'notifications',
-        name: 'Notifications',
-        component: Notifications
+        path: 'help',
+        name: 'Help',
+        component: UserProfile
       },
 
     ]

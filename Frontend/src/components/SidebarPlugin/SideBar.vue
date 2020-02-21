@@ -43,13 +43,13 @@
     props: {
       title: {
         type: String,
-        default: 'Vue Title'
+        default: 'SDN'
       },
       backgroundColor: {
         type: String,
         default: 'blue',
         validator: (value) => {
-          let acceptedValues = ['', 'blue', 'azure', 'green', 'orange', 'red', 'purple', 'black']
+          let acceptedValues = ['', 'blue', 'azure', 'green', 'orange', 'red', 'black']
           return acceptedValues.indexOf(value) !== -1
         }
       },
