@@ -7,10 +7,10 @@ import LoginUser from '../pages/Login.vue'
 // Admin pages
 import Overview from 'src/pages/Overview.vue'
 import UserProfile from 'src/pages/UserProfile.vue'
-import TableList from 'src/pages/TableList.vue'
-import Typography from 'src/pages/Typography.vue'
-import Icons from 'src/pages/Icons.vue'
-import Notifications from 'src/pages/Notifications.vue'
+import NetworkManagement from 'src/pages/NetworkManagement.vue'
+import UserManagement from 'src/pages/UserManagement.vue'
+import Settings from 'src/pages/Settings.vue'
+import Help from 'src/pages/Help.vue'
 
 const routes = [
   {
@@ -53,22 +53,22 @@ const routes = [
       {
         path: 'user-management',
         name: 'User Management',
-        component: UserProfile
+        component: UserManagement
       },
       {
         path: 'network-management',
         name: 'Network Management',
-        component: UserProfile
+        component: NetworkManagement
       },
       {
         path: 'settings',
         name: 'Settings',
-        component: UserProfile
+        component: Settings
       },
       {
         path: 'help',
         name: 'Help',
-        component: UserProfile
+        component: Help
       },
 
     ]
