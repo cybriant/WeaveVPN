@@ -4,5 +4,8 @@
 
 */package-lock.json
 */yarn.lock
+*/yarn-error.log
 */node_modules/
 */logs/
+yarn.lock
+package-lock.json
