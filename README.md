@@ -3,19 +3,36 @@
 
 # Backend
 
-Change directory to Backend directory: `$ cd Backend`
+1. Change directory to Backend directory: `cd Backend`
 
-Install dependencies first from requirements.txt `pip install -r requirements.txt`
+2. Activate Virtual Environment: 
 
-Create database and run development server `flask run`
+    * On Windows: `venv\Scripts\activate.bat`
+    * On Unix or MacOS: `source venv/Scripts/activate`
+
+3. Install dependencies first from requirements.txt 
+    * Using Python: `pip install -r requirements.txt`
+    * Using Python3: `pip3 install -r requirements.txt`
+
+4. Create database and run development server: `flask run`
 
 
 # Frontend
 
-Change directory to Frontend directory: `$ cd Frontend`
+1. Change directory to Frontend directory: `cd Frontend`
 
-Install dependencies: `$ yarn install` or `$ npm install`
+2. Install dependencies: 
+    * Using yarn (recommended): `yarn install`
+    * Using npm: `npm install`
 
-Development build (localhost): `$ yarn serve` or `$ npm run dev`
+3. Development build (local):
+    * Using yarn (recommended): `yarn serve`
+    * Using npm: `npm run dev`
 
-Production build: `$ yarn build` or `$ npm run build`
+4. Production build:
+    * Using yarn (recommended): `yarn build`
+    * Using npm: `npm run build`
+
+
+To install yarn go here: (https://classic.yarnpkg.com/en/docs/install).
+To install npm go here: (https://www.npmjs.com/get-npm).
