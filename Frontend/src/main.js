@@ -10,6 +10,7 @@ import VueRouter from 'vue-router'
 import App from './App.vue'
 import Axios from 'axios'
 import store from './store'
+import vuetify from './plugins/vuetify';
 import bootstrap from 'bootstrap-vue'
 
 Vue.use(bootstrap)
@@ -21,6 +22,7 @@ import LightBootstrap from './light-bootstrap-main'
 import routes from './routes/routes'
 
 import './registerServiceWorker'
+
 
 Vue.prototype.$http = Axios;
 const token = localStorage.getItem('token');
@@ -64,6 +66,9 @@ new Vue({
   render: h => h(App),
   router,
   store,
+  bootstrap,
+  vuetify,
+
   created () {
     const userString = localStorage.getItem('user')
     if (userString) {
