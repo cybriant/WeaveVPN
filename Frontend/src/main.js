@@ -1,23 +1,16 @@
 /*!
-
- =========================================================
- * Vue Light Bootstrap Dashboard - v2.0.0 (Bootstrap 4)
- =========================================================
-
  * Product Page: http://www.creative-tim.com/product/light-bootstrap-dashboard
  * Copyright 2019 Creative Tim (http://www.creative-tim.com)
  * Licensed under MIT (https://github.com/creativetimofficial/light-bootstrap-dashboard/blob/master/LICENSE.md)
-
- =========================================================
-
  * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
  */
+
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import App from './App.vue'
 import Axios from 'axios'
 import store from './store'
+import vuetify from './plugins/vuetify';
 import bootstrap from 'bootstrap-vue'
 
 Vue.use(bootstrap)
@@ -29,6 +22,7 @@ import LightBootstrap from './light-bootstrap-main'
 import routes from './routes/routes'
 
 import './registerServiceWorker'
+
 
 Vue.prototype.$http = Axios;
 const token = localStorage.getItem('token');
@@ -72,6 +66,9 @@ new Vue({
   render: h => h(App),
   router,
   store,
+  bootstrap,
+  vuetify,
+
   created () {
     const userString = localStorage.getItem('user')
     if (userString) {
