@@ -13,7 +13,9 @@ db = SQLAlchemy()
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(40), unique=True)
-    password = db.Column(db.String(20)) # hashed password 20 Characters
+    password = db.Column(db.String(100)) # hashed password
+    email = db.Column(db.String(140), unique=True)
+    role = db.Column(db.String(15))
 
     def __str__(self):
         return self.username
