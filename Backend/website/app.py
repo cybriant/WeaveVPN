@@ -4,7 +4,7 @@ from .models import db
 from .oauth2 import config_oauth
 from .routes import bp
 
-
+os.environ['AUTHLIB_INSECURE_TRANSPORT'] = '1'
 def create_app(config=None):
     app = Flask(__name__)
 
