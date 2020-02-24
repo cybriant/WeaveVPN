@@ -1,7 +1,7 @@
 import time
 from flask import Blueprint, request, session
 from flask import render_template, redirect, jsonify
-from werkzeug.security import gen_salt
+from werkzeug.security import gen_salt, generate_password_hash
 from authlib.integrations.flask_oauth2 import current_token
 from authlib.oauth2 import OAuth2Error
 from .models import db, User, OAuth2Client
@@ -26,13 +26,24 @@ def split_by_crlf(s):
 def home():
     if request.method == 'POST':
         username = request.form.get('username')
+        password = request.form.get('password')
+
+        password_hashed = generate_password_hash(password, method="pbkdf2:sha256", salt_length=20)
+
         user = User.query.filter_by(username=username).first()
-        if not user:
-            user = User(username=username)
+
+        if not user: # if no user exists with that username, create a new user
+            print("Password not hashed: " + password)
+            print("Password hashed: " + password_hashed)
+            user = User(username=username,password=password_hashed)
             db.session.add(user)
             db.session.commit()
-        session['id'] = user.id
+
+        if(user.check_password(password)): # if user exists and passwords match, validate the session
+            session['id'] = user.id
+
         return redirect('/')
+
     user = current_user()
     if user:
         clients = OAuth2Client.query.filter_by(user_id=user.id).all()
