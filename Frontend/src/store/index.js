@@ -41,7 +41,7 @@ export default new Vuex.Store({
     },
     login({ commit }, credentials) {
       return axios
-      .post('http://127.0.0.1:5000/api/loginpost', credentials)
+      .post('http://0.0.0.0:3000/api/login', credentials)
       .then(({ data }) => {
           commit('SET_USER_DATA', data)
         }

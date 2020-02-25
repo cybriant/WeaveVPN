@@ -128,4 +128,4 @@ def revoke_token():
 @require_oauth()
 def api_me():
     user = current_token.user
-    return jsonify(id=user.id, username=user.username)
+    return jsonify(id=user.id, username=user.username, email=user.email, role=user.role)
