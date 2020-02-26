@@ -66,9 +66,10 @@ def add_user():
 
     if not user: # If no user exists with that email, then create account
         password_hashed = generate_password_hash(password, method="pbkdf2:sha256", salt_length=20)
-        user = User(first_name=first_name, last_name=last_name, email=email, password=password_hashed, role='Administrator')
+        user = User(first_name=first_name, last_name=last_name, email=email, password=password_hashed, role=role)
         db.session.add(user)
         db.session.commit()
+        ret = {'access_token': create_access_token(email)}
         return jsonify(ret), 200
 
     else:
