@@ -19,8 +19,11 @@
     - Using Python: `pip install -r requirements.txt`
     - Using Python3: `pip3 install -r requirements.txt`
 
-4. Create database and run development server: 
-    - `flask run`
+4. Change directory to the Auth Server directory: 
+   - `cd auth_server`
+
+5. Create database and run development server: 
+    - `python app.py`
 
 # Frontend
 
