@@ -2,17 +2,20 @@ from flask import Flask, jsonify, request
 from werkzeug.security import gen_salt, generate_password_hash
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
-    get_jwt_claims
+    get_jwt_claims, current_user
 )
 from models import db, User
 from models import OAuth2Token
 from flask_cors import CORS
+import datetime
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
-app.config['JWT_SECRET_KEY'] = 'tRGeC9C8LjWab4wGRdhpqqHVqDCgpeTPKaEjtbNDyxTH8KhvkPhe2zpCuSjn2wecQdxqJCTeN67K7sN8m8wPQsHwxv4cWjXwkVvH'  # Change this!
+app.config['JWT_SECRET_KEY'] = 'tRGeC9C8LjWab4wGRdhpqqHVqDCgpeTPKaEjtbNDyxTH8KhvkPhe2zpCuSjn2wecQdxqJCTeN67K7sN8m8wPQsHwxv4cWjXwkVvH'
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(minutes=120)
 jwt = JWTManager(app)
 CORS(app)
 
