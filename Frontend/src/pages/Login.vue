@@ -58,7 +58,7 @@ export default {
   },
   methods: {
     login: function() {
-      this.loading = true
+      this.loading = true;
       let email = this.email;
       let password = this.password;
       this.$store
@@ -68,7 +68,7 @@ export default {
         })
         .then(() => this.$router.push({ name: "Dashboard" }))
         .catch(err => {
-          this.error = err.response.data.error;
+          this.error = err;
         });
     }
   }

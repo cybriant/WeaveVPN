@@ -4,12 +4,12 @@
       <h4 class="modal-title">Sign up to Create Account</h4>
       <div class="form-group">
         <label for="firstName">First Name:</label>
-        <input v-model="firstName" type="text" name="firstName" class="form-control" id="firstName" value required/>
+        <input v-model="first_name" type="text" name="first_name" class="form-control" id="firstName" value required/>
       </div>
 
       <div class="form-group">
         <label for="lastName">Last Name:</label>
-        <input v-model="lastName" type="text" name="lastName" class="form-control" id="lastName" value required/>
+        <input v-model="last_name" type="text" name="last_name" class="form-control" id="lastName" value required/>
       </div>
 
       <div class="form-group">
@@ -34,7 +34,7 @@
     </form>
 
     <ul>
-      <li v-for="(error, index) in errors" :key="index" style="color: red;">{{ error }}</li>
+      <li v-for="(error, index) in error" :key="index" style="color: red;">{{ error }}</li>
     </ul>
   </div>
 </template>
@@ -43,18 +43,19 @@
 export default {
   data() {
     return {
-      firstName: "",
-      lastName: "",
+      first_name: "",
+      last_name: "",
       email: "",
       password: "",
-      errors: ""
+      error: ""
     };
   },
   methods: {
     register() {
       this.$store
         .dispatch("register", {
-          name: this.name,
+          first_name: this.first_name,
+          last_name: this.last_name,
           email: this.email,
           password: this.password
         })
@@ -62,7 +63,8 @@ export default {
           this.$router.push({ name: "Dashboard" });
         })
         .catch(err => {
-          this.error = err.response.data.errors;
+          console.log('error')
+          this.error = err.response.data;
         });
     }
   }

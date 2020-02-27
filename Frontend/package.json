@@ -18,6 +18,7 @@
     "chartist": "^0.11.4",
     "core-js": "^3.6.4",
     "jquery": "1.9.1",
+    "jwt-decode": "^2.2.0",
     "register-service-worker": "^1.6.2",
     "v-tooltip": "^2.0.3",
     "vue": "^2.6.11",

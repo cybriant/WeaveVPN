@@ -12,6 +12,7 @@ import Axios from 'axios'
 import store from './store'
 import vuetify from './plugins/vuetify';
 import bootstrap from 'bootstrap-vue'
+import jwtDecode from 'jwt-decode'
 
 Vue.use(bootstrap)
 
@@ -25,7 +26,7 @@ import './registerServiceWorker'
 
 
 Vue.prototype.$http = Axios;
-const token = localStorage.getItem('token');
+const token = localStorage.getItem('access_token');
 
 if (token) {
   Vue.prototype.$http.defaults.headers.common['Authorization'] = token;
@@ -51,7 +52,7 @@ const router = new VueRouter({
 })
 
 router.beforeEach((to, from, next) => { // prevents unauthorzied access to routes
-  const loggedIn = localStorage.getItem('user')
+  const loggedIn = localStorage.getItem('access_token')
 
   if (to.matched.some(record => record.meta.requiresAuth) && !loggedIn) {
     next('/login') // if user is not logged in then return to login route
@@ -70,10 +71,10 @@ new Vue({
   vuetify,
 
   created () {
-    const userString = localStorage.getItem('user')
-    if (userString) {
-      const userData = JSON.parse(userString)
-      this.$store.commit('SET_USER_DATA', userData)
+    const access_token = localStorage.getItem('access_token')
+
+    if (access_token) {
+      this.$store.commit('SET_USER_DATA', access_token)
     }
     Axios.interceptors.response.use(
       response => response,

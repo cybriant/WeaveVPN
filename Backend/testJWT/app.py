@@ -6,6 +6,7 @@ from flask_jwt_extended import (
 )
 from models import db, User
 from models import OAuth2Token
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/test.db'
@@ -13,6 +14,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 app.config['JWT_SECRET_KEY'] = 'tRGeC9C8LjWab4wGRdhpqqHVqDCgpeTPKaEjtbNDyxTH8KhvkPhe2zpCuSjn2wecQdxqJCTeN67K7sN8m8wPQsHwxv4cWjXwkVvH'  # Change this!
 jwt = JWTManager(app)
+CORS(app)
 
 @app.before_first_request
 def create_tables():
@@ -32,16 +34,16 @@ def add_claims_to_access_token(identity):
 @app.route('/register', methods=['POST'])
 def register():
     
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
-    email = request.form.get('email')
-    password = request.form.get('password')
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
+    email = request.json.get('email')
+    password = request.json.get('password')
 
     user = User.query.filter_by(email=email).first()
 
     # ANYONE WHO REGISTERS A NEW ACCOUNT WILL BE ASSIGNED AN ADMIN ROLE FOR NOW, THIS WILL NEED TO BE CHANGED IN THE FUTURE
     if not user: # If no user exists with that email, then create account
-        password_hashed = generate_password_hash(password, method="pbkdf2:sha256", salt_length=20)
+        password_hashed = generate_password_hash(password=password, method="pbkdf2:sha256", salt_length=20)
         user = User(first_name=first_name, last_name=last_name, email=email,password=password_hashed,role='Administrator')
         db.session.add(user)
         db.session.commit()
@@ -56,16 +58,16 @@ def register():
 @jwt_required
 def add_user():
     
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
-    email = request.form.get('email')
+    first_name = request.json.get("first_name")
+    last_name = request.json.get("last_name")
+    email = request.json.get('email')
     password = 'password' # this should be changed to a random password that is emailed to user later down the road
-    role = request.form.get('role')
+    role = request.json.get('role')
 
     user = User.query.filter_by(email=email).first()
 
     if not user: # If no user exists with that email, then create account
-        password_hashed = generate_password_hash(password, method="pbkdf2:sha256", salt_length=20)
+        password_hashed = generate_password_hash(password=password, method="pbkdf2:sha256", salt_length=20)
         user = User(first_name=first_name, last_name=last_name, email=email, password=password_hashed, role=role)
         db.session.add(user)
         db.session.commit()
@@ -79,8 +81,8 @@ def add_user():
 @app.route('/login', methods=['POST'])
 def login():
 
-    email = request.form.get('email')
-    password = request.form.get('password')
+    email = request.json.get('email')
+    password = request.json.get('password')
 
     user = User.query.filter_by(email=email).first()
 
@@ -103,7 +105,7 @@ def login():
 def protected():
     claims = get_jwt_claims()
     return jsonify({
-        'test': 'success, this is a protected resource!'
+        'test': claims
     }), 200
 
 
