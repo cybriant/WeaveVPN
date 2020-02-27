@@ -20,11 +20,11 @@
             type="text"
             label="First Name"
             placeholder="First Name"
-            v-model="user.name"
+            v-model="user.first_name"
           ></base-input>
         </div>
         <div class="col-md-6">
-          <base-input type="text" label="Last Name" placeholder="Last Name" v-model="user.name"></base-input>
+          <base-input type="text" label="Last Name" placeholder="Last Name" v-model="user.last_name"></base-input>
         </div>
       </div>
 

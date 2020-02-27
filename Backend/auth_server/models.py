@@ -19,6 +19,15 @@ class User(db.Model):
     def get_user_id(self):
         return self.id
 
+    def get_user_role(self):
+        return self.role
+
+    def get_first_name(self):
+        return self.first_name
+
+    def get_last_name(self):
+        return self.last_name
+
     def check_password(self, password):
         return check_password_hash(self.password, password) # checks if hash password in db matches password
 

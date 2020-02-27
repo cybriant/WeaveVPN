@@ -26,9 +26,14 @@ def create_tables():
 # created for, and must return data that is json serializable
 @jwt.user_claims_loader
 def add_claims_to_access_token(identity):
+
+    user = User.query.filter_by(email=identity).first()
+
     return {
         'email': identity,
-        'role': 'Admin'
+        'role': user.get_user_role(),
+        'first_name': user.get_first_name(),
+        'last_name': user.get_last_name(),
     }
 
 @app.route('/register', methods=['POST'])
