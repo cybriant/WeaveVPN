@@ -147,14 +147,14 @@ def login():
 
     # No user exists with the email address, return 401
     if not user:
-        return jsonify({"msg": "User does not exists or invalid credentials"}), 401
+        return jsonify({"msg": "Invalid credentials"}), 401
 
     # if passwords match then log in, else return 401
     if(user.check_password(password)):
         ret = {'access_token': create_access_token(email)}
         return jsonify(ret), 200
     else:
-        return jsonify({"msg": "User does not exists or invalid credentials"}), 401
+        return jsonify({"msg": "Invalid credentials"}), 401
 
 
 # In a protected view, get the claims you added to the jwt with the

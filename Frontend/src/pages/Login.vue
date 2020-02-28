@@ -42,7 +42,7 @@
       Don't have an account?
       <router-link to="/register">Sign up</router-link>
     </div>
-    <p style="color: red;">{{ error }}</p>
+    <p style="color: red; text-align: center;">{{ error }}</p>
   </div>
 </template>
 
@@ -68,7 +68,8 @@ export default {
         })
         .then(() => this.$router.push({ name: "Dashboard" }))
         .catch(err => {
-          this.error = err;
+          this.loading = false;
+          this.error = err.response.data.msg;
         });
     }
   }
