@@ -93,20 +93,22 @@ def update_user():
     first_name = request.json.get("first_name")
     last_name = request.json.get("last_name")
     email = request.json.get('email')
+    original_email = request.json.get('original_email')
     role = request.json.get('role')
 
-    user = User.query.filter_by(email=email).first()
+    user = User.query.filter_by(email=original_email).first()
 
-    if not user: # If no user exists with that email, then throw error
-        ret = {'error': 'User not found'}
-        return jsonify(ret), 404
-    else:
+    if user:
         user.first_name = first_name
         user.last_name = last_name
         user.email = email
         user.role = role
         db.session.commit()
-        return jsonify({"msg": "Successfully updated user!"}), 200        
+        return jsonify({"msg": "Successfully updated user!"}), 200       
+    else:
+        ret = {'error': 'User not found'}
+        return jsonify(ret), 404
+           
 
 # Admins can use this route to delete a user
 @app.route('/delete-user/<email>', methods=['DELETE'])

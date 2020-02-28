@@ -49,6 +49,7 @@
                             </v-col>
                             <v-col cols="12" sm="12" md="12">
                               <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
+                              <input v-model="editedItem.original_email" hidden>
                             </v-col>
                             <v-col cols="12" sm="12" md="12">
                               <v-select :items="roles" v-model="editedItem.role" label="Role"></v-select>
@@ -141,6 +142,7 @@ export default {
       this.editedIndex = this.users.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
+      this.editedItem.original_email = this.editedItem.email
     },
 
     deleteItem(item) {
@@ -176,13 +178,14 @@ export default {
           first_name: this.editedItem.first_name,
           last_name: this.editedItem.last_name,
           email: this.editedItem.email,
+          original_email: this.editedItem.original_email,
           role: this.editedItem.role
         })
         .then(({ data }) => {
           Object.assign(this.users[this.editedIndex], this.editedItem); // update table info (frontend)
         })
         .catch(err => {
-          console.log(err);
+          console.log(err.response.data);
           this.error = err.response.data;
         });
 
