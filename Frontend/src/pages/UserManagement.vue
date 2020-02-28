@@ -170,9 +170,21 @@ export default {
     save() {
       if (this.editedIndex > -1) {
 
-        // update user
-
-        Object.assign(this.users[this.editedIndex], this.editedItem);
+        // update user and save to db
+        this.$http
+        .put('http://127.0.0.1:5000/update-user', {
+          first_name: this.editedItem.first_name,
+          last_name: this.editedItem.last_name,
+          email: this.editedItem.email,
+          role: this.editedItem.role
+        })
+        .then(({ data }) => {
+          Object.assign(this.users[this.editedIndex], this.editedItem); // update table info (frontend)
+        })
+        .catch(err => {
+          console.log(err);
+          this.error = err.response.data;
+        });
 
         
 
@@ -189,7 +201,7 @@ export default {
           role: this.editedItem.role
         })
         .then(({ data }) => {
-          this.users.push(this.editedItem); 
+          this.users.push(this.editedItem);  // add user to table (frontend)
         })
         .catch(err => {
           console.log(err);
