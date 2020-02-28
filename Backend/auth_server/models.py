@@ -31,6 +31,14 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password) # checks if hash password in db matches password
 
+    def serialize(self):
+        return {
+            'first_name': self.first_name, 
+            'last_name': self.last_name,
+            'email': self.email,
+            'role': self.role,
+        }
+
 
 class OAuth2Token(db.Model):
     __tablename__ = 'oauth2_token'

@@ -42,16 +42,13 @@
                         <v-container>
                           <v-row>
                             <v-col cols="12" sm="12" md="6">
-                              <v-text-field v-model="editedItem.firstName" label="First Name"></v-text-field>
+                              <v-text-field v-model="editedItem.first_name" label="First Name"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="12" md="6">
-                              <v-text-field v-model="editedItem.lastName" label="Last Name"></v-text-field>
+                              <v-text-field v-model="editedItem.last_name" label="Last Name"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="12" md="12">
                               <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
-                            </v-col>
-                            <v-col cols="12" sm="12" md="12">
-                              <v-text-field v-model="editedItem.organization" label="Organization"></v-text-field>
                             </v-col>
                             <v-col cols="12" sm="12" md="12">
                               <v-select :items="roles" v-model="editedItem.role" label="Role"></v-select>
@@ -92,13 +89,9 @@ export default {
     search: "",
     dialog: false,
     headers: [
-      {
-        text: "Name",
-        align: "left",
-        value: "name"
-      },
+      { text: "First Name", align: "left", value: "first_name" },
+      { text: "Last Name", value: "last_name" },
       { text: "Email", value: "email" },
-      { text: "Organization", value: "organization" },
       { text: "Role", value: "role" },
       { text: "Actions", value: "action", sortable: false }
     ],
@@ -129,38 +122,19 @@ export default {
 
   methods: {
     initialize() {
-      this.users = [
-        {
-          name: "Tiger Woods",
-          email: "test@email.com",
-          organization: "KSU",
-          role: "Administrator"
-        },
-        {
-          name: "LeBron James",
-          email: "test@email.com",
-          organization: "KSU",
-          role: "Administrator"
-        },
-        {
-          name: "Tom Brady",
-          email: "test@email.com",
-          organization: "KSU",
-          role: "User"
-        },
-        {
-          name: "James Bond",
-          email: "test@email.com",
-          organization: "KSU",
-          role: "Administrator"
-        },
-        {
-          name: "John Wick",
-          email: "test@email.com",
-          organization: "KSU",
-          role: "User"
-        }
-      ];
+
+      this.$http
+        .get('http://127.0.0.1:5000/get-users')
+        .then(({ data }) => {
+          // Adds the users from the database to the table
+          this.users = data.users;
+        })
+        .catch(err => {
+          console.log(err);
+          this.error = err.response.data;
+        });
+
+      
     },
 
     editItem(item) {
@@ -185,9 +159,33 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
+
+        // update user
+
         Object.assign(this.users[this.editedIndex], this.editedItem);
+
+        
+
       } else {
-        this.users.push(this.editedItem);
+
+        console.log(this.editedItem)
+
+        // create new user and save to db
+        this.$http
+        .post('http://127.0.0.1:5000/add-user', {
+          first_name: this.editedItem.first_name,
+          last_name: this.editedItem.last_name,
+          email: this.editedItem.email,
+          role: this.editedItem.role
+        })
+        .then(({ data }) => {
+          console.log(data);
+          this.users.push(this.editedItem); 
+        })
+        .catch(err => {
+          console.log(err);
+          this.error = err.response.data;
+        });
       }
       this.close();
     }

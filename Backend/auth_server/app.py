@@ -79,11 +79,21 @@ def add_user():
         user = User(first_name=first_name, last_name=last_name, email=email, password=password_hashed, role=role)
         db.session.add(user)
         db.session.commit()
-        ret = {'access_token': create_access_token(email)}
+        ret = {'msg': 'Success'}
         return jsonify(ret), 200
 
     else:
         return jsonify({"msg": "Account with that email already exists, please try again with a new email."}), 401
+
+
+@app.route('/get-users', methods=['GET'])
+def get_users():
+    
+    # get all users from db
+    users = User.query.all()
+
+    # returns list of users
+    return jsonify(users=[user.serialize() for user in users])
 
 
 @app.route('/login', methods=['POST'])
