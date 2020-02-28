@@ -85,6 +85,23 @@ def add_user():
     else:
         return jsonify({"msg": "Account with that email already exists, please try again with a new email."}), 401
 
+# Admins can use this route to delete a user
+@app.route('/delete-user/<email>', methods=['DELETE'])
+@jwt_required
+def delete_user(email):
+
+    user = User.query.filter_by(email=email).first()
+
+    if not user: # If no user exists with that email, then return error
+        ret = {'error': 'User not found'}
+        return jsonify(ret), 404
+
+    else:
+        User.query.filter_by(email=email).delete()
+        db.session.commit()
+        ret = {'msg': 'Successfully deleted user'}
+        return jsonify(ret), 204
+
 
 @app.route('/get-users', methods=['GET'])
 def get_users():

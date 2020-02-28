@@ -144,9 +144,19 @@ export default {
     },
 
     deleteItem(item) {
-      const index = this.users.indexOf(item);
+
+      const index = this.users.indexOf(item); // gets index of user in table
+
       confirm("Are you sure you want to delete this user?") &&
-        this.users.splice(index, 1);
+        this.$http
+        .delete('http://127.0.0.1:5000/delete-user/'+item.email)
+        .then(({ data }) => {
+          this.users.splice(index, 1); // remove user from table
+        })
+        .catch(err => {
+          console.log(err);
+          this.error = err.response.data;
+        });
     },
 
     close() {
@@ -179,7 +189,6 @@ export default {
           role: this.editedItem.role
         })
         .then(({ data }) => {
-          console.log(data);
           this.users.push(this.editedItem); 
         })
         .catch(err => {

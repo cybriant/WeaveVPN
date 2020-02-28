@@ -37,6 +37,7 @@ class User(db.Model):
             'last_name': self.last_name,
             'email': self.email,
             'role': self.role,
+            'id': self.id,
         }
 
 
