@@ -97,7 +97,7 @@ def delete_user(email):
         return jsonify(ret), 404
 
     else:
-        User.query.filter_by(email=email).delete()
+        db.session.delete(user)
         db.session.commit()
         ret = {'msg': 'Successfully deleted user'}
         return jsonify(ret), 204
