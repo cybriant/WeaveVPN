@@ -49,7 +49,7 @@
                             </v-col>
                             <v-col cols="12" sm="12" md="12">
                               <v-text-field v-model="editedItem.email" label="Email"></v-text-field>
-                              <input v-model="editedItem.original_email" hidden>
+                              <input v-model="editedItem.original_email" hidden />
                             </v-col>
                             <v-col cols="12" sm="12" md="12">
                               <v-select :items="roles" v-model="editedItem.role" label="Role"></v-select>
@@ -70,8 +70,8 @@
                 </v-toolbar>
               </template>
               <template v-slot:item.action="{ item }">
-                <v-icon  class="mr-2" @click="editItem(item)" title="Edit User">edit</v-icon>
-                <v-icon  @click="deleteItem(item)" title="Delete User">delete</v-icon>
+                <v-icon class="mr-2" @click="editItem(item)" title="Edit User">edit</v-icon>
+                <v-icon @click="deleteItem(item)" title="Delete User">delete</v-icon>
               </template>
               <template v-slot:no-data>
                 <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -123,42 +123,53 @@ export default {
 
   methods: {
     initialize() {
-
       this.$http
-        .get('http://127.0.0.1:5000/get-users')
+        .get("http://127.0.0.1:5000/get-users")
         .then(({ data }) => {
           // Adds the users from the database to the table
           this.users = data.users;
         })
         .catch(err => {
-          console.log(err);
-          this.error = err.response.data;
+          console.log(err.response.data);
+          this.$notify({
+            group: "foo",
+            title: "Error",
+            text: err.response.data,
+            type: "error"
+          });
         });
-
-      
     },
 
     editItem(item) {
       this.editedIndex = this.users.indexOf(item);
       this.editedItem = Object.assign({}, item);
       this.dialog = true;
-      this.editedItem.original_email = this.editedItem.email
+      this.editedItem.original_email = this.editedItem.email;
     },
 
     deleteItem(item) {
-
       const index = this.users.indexOf(item); // gets index of user in table
 
       confirm("Are you sure you want to delete this user?") &&
         this.$http
-        .delete('http://127.0.0.1:5000/delete-user/'+item.email)
-        .then(({ data }) => {
-          this.users.splice(index, 1); // remove user from table
-        })
-        .catch(err => {
-          console.log(err);
-          this.error = err.response.data;
-        });
+          .delete("http://127.0.0.1:5000/delete-user/" + item.email)
+          .then(({ data }) => {
+            this.users.splice(index, 1); // remove user from table
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "User has been successfully deleted!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data,
+              type: "error"
+            });
+          });
     },
 
     close() {
@@ -171,45 +182,59 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-
         // update user and save to db
         this.$http
-        .put('http://127.0.0.1:5000/update-user', {
-          first_name: this.editedItem.first_name,
-          last_name: this.editedItem.last_name,
-          email: this.editedItem.email,
-          original_email: this.editedItem.original_email,
-          role: this.editedItem.role
-        })
-        .then(({ data }) => {
-          Object.assign(this.users[this.editedIndex], this.editedItem); // update table info (frontend)
-        })
-        .catch(err => {
-          console.log(err.response.data);
-          this.error = err.response.data;
-        });
-
-        
-
+          .put("http://127.0.0.1:5000/update-user", {
+            first_name: this.editedItem.first_name,
+            last_name: this.editedItem.last_name,
+            email: this.editedItem.email,
+            original_email: this.editedItem.original_email,
+            role: this.editedItem.role
+          })
+          .then(({ data }) => {
+            Object.assign(this.users[this.editedIndex], this.editedItem); // update table info (frontend)
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "User has been successfully updated!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data,
+              type: "error"
+            });
+          });
       } else {
-
-        console.log(this.editedItem)
-
         // create new user and save to db
         this.$http
-        .post('http://127.0.0.1:5000/add-user', {
-          first_name: this.editedItem.first_name,
-          last_name: this.editedItem.last_name,
-          email: this.editedItem.email,
-          role: this.editedItem.role
-        })
-        .then(({ data }) => {
-          this.users.push(this.editedItem);  // add user to table (frontend)
-        })
-        .catch(err => {
-          console.log(err);
-          this.error = err.response.data;
-        });
+          .post("http://127.0.0.1:5000/add-user", {
+            first_name: this.editedItem.first_name,
+            last_name: this.editedItem.last_name,
+            email: this.editedItem.email,
+            role: this.editedItem.role
+          })
+          .then(({ data }) => {
+            this.users.push(this.editedItem); // add user to table (frontend)
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "User has been successfully created!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.error = err.response.data;
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data,
+              type: "error"
+            });
+          });
       }
       this.close();
     }
