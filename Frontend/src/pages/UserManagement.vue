@@ -166,7 +166,7 @@ export default {
             this.$notify({
               group: "foo",
               title: "Error",
-              text: err.response.data,
+              text: err.response.data.msg,
               type: "error"
             });
           });
@@ -204,7 +204,7 @@ export default {
             this.$notify({
               group: "foo",
               title: "Error",
-              text: err.response.data,
+              text: err.response.data.msg,
               type: "error"
             });
           });
@@ -231,7 +231,7 @@ export default {
             this.$notify({
               group: "foo",
               title: "Error",
-              text: err.response.data,
+              text: err.response.data.msg,
               type: "error"
             });
           });

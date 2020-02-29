@@ -106,7 +106,7 @@ def update_user():
         db.session.commit()
         return jsonify({"msg": "Successfully updated user!"}), 200       
     else:
-        ret = {'error': 'User not found'}
+        ret = {'msg': 'User not found in database'}
         return jsonify(ret), 404
            
 
@@ -118,7 +118,7 @@ def delete_user(email):
     user = User.query.filter_by(email=email).first()
 
     if not user: # If no user exists with that email, then return error
-        ret = {'error': 'User not found'}
+        ret = {'msg': 'User not found in database'}
         return jsonify(ret), 404
 
     else:
