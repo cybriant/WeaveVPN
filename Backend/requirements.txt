@@ -1,6 +1,6 @@
 Flask
 Flask-SQLAlchemy
 flask-jwt-extended
-Authlib==0.13
 flask-cors
+Flask-RestPlus
 
