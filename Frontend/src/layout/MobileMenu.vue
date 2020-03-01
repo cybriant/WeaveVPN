@@ -28,16 +28,14 @@
     </base-dropdown>
 
     <li class="nav-item">
-      <a href="#">
-        <span class="no-icon">Log out</span>
-      </a>
+      <a href="/login" class="nav-link" type="button" @click="logout">Logout</a>
     </li>
   </ul>
 </template>
 <script>
-  export default {
-    name: 'mobile-menu'
-  }
+export default {
+  name: "mobile-menu"
+};
 </script>
 <style>
 </style>
