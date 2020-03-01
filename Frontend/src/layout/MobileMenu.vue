@@ -34,8 +34,13 @@
 </template>
 <script>
 export default {
-  name: "mobile-menu"
-};
+  name: "mobile-menu",
+  methods: {
+      logout () {
+        this.$store.dispatch('logout')
+      }
+  }
+}
 </script>
 <style>
 </style>
