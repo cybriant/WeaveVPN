@@ -95,7 +95,6 @@ class AddUser(Resource):
         'first_name': fields.String(description='First Name', required=True),
         'last_name': fields.String(description='Last Name', required=True),
         'email': fields.String(description='Email', required=True),
-        'password': fields.String(description='Password', required=True),
         'role': fields.String(description='Password', required=True),
     })
 
