@@ -125,7 +125,7 @@ class AddUser(Resource):
             return make_response(jsonify(ret), 200)
 
         else:
-            return make_response(jsonify({"msg": "Account with that email already exists, please try again with a new email."}), 401)
+            return make_response(jsonify({"msg": "Account with that email already exists, please try again with a new email."}), 400)
 
 # Admins can use this route to edit/update a user
 @api.route('/update-user')
@@ -163,7 +163,7 @@ class UpdateUser(Resource):
             return make_response(jsonify({"msg": "Successfully updated user!"}), 200)
         else:
             ret = {'msg': 'User not found in database'}
-            return make_response(jsonify(ret), 404)
+            return make_response(jsonify(ret), 400)
 
 
 # Admins can use this route to delete a user
@@ -182,7 +182,7 @@ class DeleteUser(Resource):
 
         if not user:  # If no user exists with that email, then return error
             ret = {'msg': 'User not found in database'}
-            return make_response(jsonify(ret), 404)
+            return make_response(jsonify(ret), 400)
 
         else:
             db.session.delete(user)
