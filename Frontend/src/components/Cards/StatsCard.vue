@@ -2,7 +2,7 @@
   <card class="card-stats">
     <div class="row">
       <div class="col-5" v-if="$slots.header">
-        <div class="icon-big text-center">
+        <div class="icon-big">
           <slot name="header"></slot>
         </div>
       </div>
