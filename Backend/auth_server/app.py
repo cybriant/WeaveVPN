@@ -202,8 +202,10 @@ class GetUsers(Resource):
         # get all users from db
         users = User.query.all()
 
+        size = len(users)
+
         # returns list of users
-        return make_response(jsonify(users=[user.serialize() for user in users]))
+        return make_response(jsonify(size=size,users=[user.serialize() for user in users]))
 
 
 @api.route('/login')
