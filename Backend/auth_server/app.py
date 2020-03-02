@@ -98,7 +98,7 @@ class AddUser(Resource):
         'role': fields.String(description='Password', required=True),
     })
 
-    @api.doc(body=add_user_fields, security='Bearer Auth')
+    @api.doc(body=add_user_fields)
     @jwt_required
     def post(self):
         """
@@ -139,7 +139,7 @@ class UpdateUser(Resource):
         'role': fields.String(description='Password', required=True),
     })
 
-    @api.doc(body=update_user_fields, security='Bearer Auth')
+    @api.doc(body=update_user_fields)
     @jwt_required
     def put(self):
         """
@@ -171,7 +171,6 @@ class UpdateUser(Resource):
 @api.doc(params={'email': ''})
 class DeleteUser(Resource):
 
-    @api.doc(security='Bearer Auth')
     @jwt_required
     def delete(self, email):
         """
@@ -194,7 +193,6 @@ class DeleteUser(Resource):
 @api.route('/get-users')
 class GetUsers(Resource):
 
-    @api.doc(security='Bearer Auth')
     @jwt_required
     def get(self):
         """
@@ -244,7 +242,6 @@ class Login(Resource):
 @api.route('/protected')
 class TestProtectedMethod(Resource):
 
-    @api.doc(security='Bearer Auth')
     @jwt_required
     def get(self):
         """
