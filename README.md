@@ -12,7 +12,7 @@
    - `cd Backend`
 
 2. Activate Virtual Environment: 
-    - On Windows: `venv/Scripts/activate.bat`
+    - On Windows: `venv/Scripts/activate`
     - On Unix or MacOS: `source venv/Scripts/activate`
 
 3. Install dependencies first from requirements.txt 
