@@ -7,6 +7,7 @@ from flask_jwt_extended import (
 from models import db, User
 from flask_restplus import Api, Resource, fields
 from flask_cors import CORS
+from abc import ABC, abstractmethod
 import datetime
 
 
@@ -205,7 +206,7 @@ class GetUsers(Resource):
         size = len(users)
 
         # returns list of users
-        return make_response(jsonify(size=size,users=[user.serialize() for user in users]))
+        return make_response(jsonify(size=size, users=[user.serialize() for user in users]))
 
 
 @api.route('/login')
@@ -253,6 +254,25 @@ class TestProtectedMethod(Resource):
         return make_response(jsonify({
             'test': claims
         }), 200)
+
+
+class ServerNode(ABC):
+    @abstractmethod
+    def createNode(self):
+        pass
+
+
+@api.route('/setup', methods=['GET', 'POST'])
+class GetForm(ServerNode):
+    @jwt_required
+    def createNode(self):
+        id = ""
+        name = ""
+        log = ""
+        dateCreated = ""
+        #TODO Get the proper data to setup
+        #data = request.form["id"]
+        #return jsonify({'ip': request.remote_addr}), 200
 
 
 if __name__ == '__main__':
