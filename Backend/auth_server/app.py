@@ -258,7 +258,7 @@ class GetServerGroups(Resource):
         return make_response(jsonify(size=size, server_groups=[server_group.serialize() for server_group in server_groups]))
 
 
-@ns_server_group.route('/add')
+@ns_server_group.route('/create')
 class AddServerGroup(Resource):
 
     add_server_group_fields = api.model('Add Server Group', {

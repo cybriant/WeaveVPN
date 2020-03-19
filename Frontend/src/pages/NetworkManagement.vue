@@ -107,7 +107,7 @@ export default {
     },
     addServerGroup() {
       this.$http
-          .post("http://127.0.0.1:5000/server-group/add", {
+          .post("http://127.0.0.1:5000/server-group/create", {
             name: this.server_group_item.name,
             organization: this.server_group_item.organization,
             category: this.server_group_item.category,
