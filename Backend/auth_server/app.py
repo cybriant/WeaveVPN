@@ -30,7 +30,7 @@ authorizations = {
 
 api = Api(app, security='Bearer Auth', authorizations=authorizations)
 
-ns_network_management = api.namespace(
+ns_network = api.namespace(
     'network', description='API for SDN Network')
 
 
@@ -241,7 +241,7 @@ class Login(Resource):
             return make_response(jsonify({"msg": "Invalid credentials"}), 401)
 
 
-@ns_network_management.route('/add-server-group')
+@ns_network.route('/add-server-group')
 class AddServerGroup(Resource):
 
     add_server_group_fields = api.model('Add Server Group', {
@@ -254,7 +254,7 @@ class AddServerGroup(Resource):
 
     })
 
-    @ns_network_management.doc(body=add_server_group_fields)
+    @ns_network.doc(body=add_server_group_fields)
     @jwt_required
     def post(self):
         """
