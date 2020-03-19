@@ -8,20 +8,8 @@
               <i class="nc-icon nc-circle-09 text-primary"></i>
             </div>
             <div slot="content">
-              <p class="card-category">Active Users</p>
+              <p class="card-category">Users</p>
               <h4 class="card-title">{{ user_list_size }}</h4>
-            </div>
-          </stats-card>
-        </div>
-
-        <div class="col-xl-3 col-md-6">
-          <stats-card>
-            <div slot="header" class="icon-success">
-              <i class="nc-icon nc-light-3 text-success"></i>
-            </div>
-            <div slot="content">
-              <p class="card-category">Revenue</p>
-              <h4 class="card-title">$1,345</h4>
             </div>
           </stats-card>
         </div>
@@ -32,8 +20,20 @@
               <i class="nc-icon nc-vector text-danger"></i>
             </div>
             <div slot="content">
-              <p class="card-category">Errors</p>
-              <h4 class="card-title">23</h4>
+              <p class="card-category">Server Groups</p>
+              <h4 class="card-title">{{ server_group_list_size }}</h4>
+            </div>
+          </stats-card>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <stats-card>
+            <div slot="header" class="icon-success">
+              <i class="nc-icon nc-light-3 text-success"></i>
+            </div>
+            <div slot="content">
+              <p class="card-category">Test</p>
+              <h4 class="card-title">0</h4>
             </div>
           </stats-card>
         </div>
@@ -44,8 +44,8 @@
               <i class="nc-icon nc-favourite-28 text-primary"></i>
             </div>
             <div slot="content">
-              <p class="card-category">Followers</p>
-              <h4 class="card-title">{{ info }}</h4>
+              <p class="card-category">Test</p>
+              <h4 class="card-title">0</h4>
             </div>
           </stats-card>
         </div>
@@ -58,7 +58,7 @@
             :responsive-options="lineChart.responsiveOptions"
           >
             <template slot="header">
-              <h4 class="card-title">Users Behavior</h4>
+              <h4 class="card-title">Test</h4>
               <p class="card-category">24 Hours performance</p>
             </template>
             <template slot="footer">
@@ -75,7 +75,7 @@
         <div class="col-md-4">
           <chart-card :chart-data="pieChart.data" chart-type="Pie">
             <template slot="header">
-              <h4 class="card-title">Email Statistics</h4>
+              <h4 class="card-title">Test</h4>
               <p class="card-category">Last Campaign Performance</p>
             </template>
             <template slot="footer">
@@ -99,7 +99,7 @@
             chart-type="Bar"
           >
             <template slot="header">
-              <h4 class="card-title">2014 Sales</h4>
+              <h4 class="card-title">Test</h4>
               <p class="card-category">All products including Taxes</p>
             </template>
             <template slot="footer">
@@ -118,7 +118,7 @@
         <div class="col-md-6">
           <card>
             <template slot="header">
-              <h5 class="title">Tasks</h5>
+              <h5 class="title">Test</h5>
               <p class="category">Backend development</p>
             </template>
             <l-table :data="tableData.data" :columns="tableData.columns">
@@ -167,6 +167,7 @@ export default {
   data() {
     return {
       user_list_size: '',
+      server_group_list_size: '',
       info: null,
       editTooltip: "Edit Task",
       deleteTooltip: "Remove",
@@ -296,8 +297,22 @@ export default {
     this.$http
       .get("http://127.0.0.1:5000/get-users")
       .then(({ data }) => {
-        // Adds the users from the database to the table
         this.user_list_size = data.size;
+      })
+      .catch(err => {
+        console.log(err.response.data);
+        this.$notify({
+          group: "foo",
+          title: "Error",
+          text: err.response.data,
+          type: "error"
+        });
+      }),
+
+      this.$http
+      .get("http://127.0.0.1:5000/network/get-server-groups")
+      .then(({ data }) => {
+        this.server_group_list_size = data.size;
       })
       .catch(err => {
         console.log(err.response.data);
