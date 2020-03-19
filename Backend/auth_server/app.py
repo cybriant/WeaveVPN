@@ -31,7 +31,7 @@ authorizations = {
 api = Api(app, security='Bearer Auth', authorizations=authorizations)
 
 ns_network_management = api.namespace(
-    'network_management', description='Network Manager')
+    'network', description='API for SDN Network')
 
 
 @app.before_first_request
