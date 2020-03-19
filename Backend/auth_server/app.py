@@ -250,7 +250,7 @@ class AddServerGroup(Resource):
         'category': fields.String(description='Category', required=True),
         'lower_ip_range': fields.String(description='Lower IP Range', required=True),
         'upper_ip_range': fields.String(description='Upper IP Range', required=True),
-        'Description': fields.String(description='Description', required=True),
+        'description': fields.String(description='Description', required=True),
 
     })
 

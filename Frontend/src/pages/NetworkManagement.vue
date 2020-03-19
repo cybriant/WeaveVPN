@@ -6,6 +6,9 @@
           <card>
             <h4 style="margin-top: 0;">Network Management</h4>
 
+
+            <!-- CREATE SERVER GROUP MODAL -->
+
             <v-dialog v-model="dialog" persistent max-width="600px">
               <template v-slot:activator="{ on }">
                 <v-btn color="primary" dark v-on="on">Create Server Group</v-btn>
@@ -18,35 +21,36 @@
                   <v-container>
                     <v-row>
                       <v-col cols="12">
-                        <v-text-field label="Name" required></v-text-field>
+                        <v-text-field label="Name" v-model="server_group_item.name" required></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
-                        <v-text-field label="Organization"></v-text-field>
+                        <v-text-field label="Organization" v-model="server_group_item.organization" required></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6" md="6">
-                        <v-text-field
-                          label="Category"
-                        ></v-text-field>
+                        <v-text-field label="Category" v-model="server_group_item.category"></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <v-text-field label="Lower IP Range" hint="ex 192.168.0.1" required></v-text-field>
+                        <v-text-field label="Lower IP Range" hint="ex 192.168.0.1" v-model="server_group_item.lower_ip_range" required></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6">
-                        <v-text-field label="Upper IP Range" hint="ex 192.168.10.100" required></v-text-field>
+                        <v-text-field label="Upper IP Range" hint="ex 192.168.10.100" v-model="server_group_item.upper_ip_range" required></v-text-field>
                       </v-col>
                       <v-col cols="12">
-                        <v-text-field label="Description"></v-text-field>
+                        <v-text-field label="Description" v-model="server_group_item.description"></v-text-field>
                       </v-col>
                     </v-row>
                   </v-container>
                 </v-card-text>
                 <v-card-actions>
                   <v-spacer></v-spacer>
-                  <v-btn color="blue darken-1" text @click="dialog = false">Cancel</v-btn>
-                  <v-btn color="blue darken-1" text @click="dialog = false">Create</v-btn>
+                  <v-btn color="grey darken-1" text @click="dialog = false">Cancel</v-btn>
+                  <v-btn color="primary" outlined @click="addServerGroup">Create</v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
+
+            <!-- END OF SERVER GROUP MODAL --> 
+
           </card>
         </div>
       </div>
@@ -59,7 +63,41 @@ export default {
   components: {},
   data: () => ({
     dialog: false,
-  })
+    server_group_item: {},
+    server_groups: [],
+  }),
+  methods: {
+    addServerGroup() {
+      this.$http
+          .post("http://127.0.0.1:5000/network/add-server-group", {
+            name: this.server_group_item.name,
+            organization: this.server_group_item.organization,
+            category: this.server_group_item.category,
+            lower_ip_range: this.server_group_item.lower_ip_range,
+            upper_ip_range: this.server_group_item.upper_ip_range,
+            description: this.server_group_item.description
+          })
+          .then(({ data }) => {
+           // this.server_groups.push(this.server_group_item); // add server group to table (frontend)
+            this.dialog = false,
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "Server group has been successfully created!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.error = err.response.data;
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data.msg,
+              type: "error"
+            });
+          });
+    }
+  }
   // mounted () {
   // this.$http
   //   .get('http://127.0.0.1:5000/api/login')
