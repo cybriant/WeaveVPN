@@ -310,7 +310,7 @@ export default {
       }),
 
       this.$http
-      .get("http://127.0.0.1:5000/network/get-server-groups")
+      .get("http://127.0.0.1:5000/server-group/all")
       .then(({ data }) => {
         this.server_group_list_size = data.size;
       })

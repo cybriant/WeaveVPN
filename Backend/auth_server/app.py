@@ -30,8 +30,8 @@ authorizations = {
 
 api = Api(app, security='Bearer Auth', authorizations=authorizations)
 
-ns_network = api.namespace(
-    'network', description='API for SDN Network')
+ns_server_group = api.namespace(
+    'server-group', description='API calls for server groups')
 
 
 @app.before_first_request
@@ -240,7 +240,7 @@ class Login(Resource):
         else:
             return make_response(jsonify({"msg": "Invalid credentials"}), 401)
 
-@ns_network.route('/get-server-groups')
+@ns_server_group.route('/all')
 class GetServerGroups(Resource):
 
     @jwt_required
@@ -258,7 +258,7 @@ class GetServerGroups(Resource):
         return make_response(jsonify(size=size, server_groups=[server_group.serialize() for server_group in server_groups]))
 
 
-@ns_network.route('/add-server-group')
+@ns_server_group.route('/add')
 class AddServerGroup(Resource):
 
     add_server_group_fields = api.model('Add Server Group', {
@@ -271,7 +271,7 @@ class AddServerGroup(Resource):
 
     })
 
-    @ns_network.doc(body=add_server_group_fields)
+    @ns_server_group.doc(body=add_server_group_fields)
     @jwt_required
     def post(self):
         """

@@ -90,7 +90,7 @@ export default {
   methods: {
     getServerGroups() {
       this.$http
-        .get("http://127.0.0.1:5000/network/get-server-groups")
+        .get("http://127.0.0.1:5000/server-group/all")
         .then(({ data }) => {
           // Adds the users from the database to the table
           this.server_groups = data.server_groups;
@@ -107,7 +107,7 @@ export default {
     },
     addServerGroup() {
       this.$http
-          .post("http://127.0.0.1:5000/network/add-server-group", {
+          .post("http://127.0.0.1:5000/server-group/add", {
             name: this.server_group_item.name,
             organization: this.server_group_item.organization,
             category: this.server_group_item.category,
