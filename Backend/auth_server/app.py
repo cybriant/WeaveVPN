@@ -299,22 +299,6 @@ class AddServerGroup(Resource):
             return make_response(jsonify({"msg": "Server Group with that name already exists, please try again with a new name."}), 400)
 
 
-# In a protected view, get the claims you added to the jwt with the
-# get_jwt_claims() method
-@api.route('/protected')
-class TestProtectedMethod(Resource):
-
-    @jwt_required
-    def get(self):
-        """
-        Test protected route
-        """
-        claims = get_jwt_claims()
-        return make_response(jsonify({
-            'test': claims
-        }), 200)
-
-
 # class ServerNode(ABC):
 #    @abstractmethod
 #    def createNode(self):
