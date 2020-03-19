@@ -11,7 +11,7 @@
 
             <v-dialog v-model="dialog" persistent max-width="600px">
               <template v-slot:activator="{ on }">
-                <v-btn color="primary" dark v-on="on">Create Server Group</v-btn>
+                <v-btn color="primary" dark v-on="on" style="margin-bottom: 20px;">Create Server Group</v-btn>
               </template>
               <v-card>
                 <v-card-title>
@@ -51,6 +51,14 @@
 
             <!-- END OF SERVER GROUP MODAL --> 
 
+            <v-data-table
+              :headers="headers"
+              :items="server_groups"
+              :search="search"
+              sort-by="Name"
+              class="elevation-1"
+            >
+            </v-data-table>
           </card>
         </div>
       </div>
@@ -65,8 +73,38 @@ export default {
     dialog: false,
     server_group_item: {},
     server_groups: [],
+    search: "",
+    headers: [
+      { text: "Name", value: "name" },
+      { text: "Organization", value: "organization" },
+      { text: "Category", value: "category" },
+      { text: "Lower IP Range", value: "lower_ip_range" },
+      { text: "Upper IP Range", value: "upper_ip_range" },
+      { text: "Description", value: "description" }
+    ],
+
   }),
+  created() {
+    this.getServerGroups();
+  },
   methods: {
+    getServerGroups() {
+      this.$http
+        .get("http://127.0.0.1:5000/network/get-server-groups")
+        .then(({ data }) => {
+          // Adds the users from the database to the table
+          this.server_groups = data.server_groups;
+        })
+        .catch(err => {
+          console.log(err.response.data);
+          this.$notify({
+            group: "foo",
+            title: "Error",
+            text: err.response.data,
+            type: "error"
+          });
+        });
+    },
     addServerGroup() {
       this.$http
           .post("http://127.0.0.1:5000/network/add-server-group", {
@@ -78,7 +116,7 @@ export default {
             description: this.server_group_item.description
           })
           .then(({ data }) => {
-           // this.server_groups.push(this.server_group_item); // add server group to table (frontend)
+            this.server_groups.push(this.server_group_item); // add server group to table (frontend)
             this.dialog = false,
             this.$notify({
               group: "foo",
@@ -96,7 +134,8 @@ export default {
               type: "error"
             });
           });
-    }
+    },
+
   }
   // mounted () {
   // this.$http

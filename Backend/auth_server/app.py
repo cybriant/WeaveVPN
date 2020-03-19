@@ -240,6 +240,23 @@ class Login(Resource):
         else:
             return make_response(jsonify({"msg": "Invalid credentials"}), 401)
 
+@ns_network.route('/get-server-groups')
+class GetServerGroups(Resource):
+
+    @jwt_required
+    def get(self):
+        """
+        Returns a list of all server groups
+        """
+
+        # get all server groups from db
+        server_groups = ServerGroup.query.all()
+
+        size = len(server_groups)
+
+        # returns list of server groups as json response
+        return make_response(jsonify(size=size, server_groups=[server_group.serialize() for server_group in server_groups]))
+
 
 @ns_network.route('/add-server-group')
 class AddServerGroup(Resource):
