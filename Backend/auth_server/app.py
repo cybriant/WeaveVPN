@@ -4,10 +4,10 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_claims, current_user
 )
-from models import db, User
+from models import db, User, ServerGroup
 from flask_restplus import Api, Resource, fields
 from flask_cors import CORS
-from abc import ABC, abstractmethod
+#from abc import ABC, abstractmethod
 import datetime
 
 
@@ -30,7 +30,8 @@ authorizations = {
 
 api = Api(app, security='Bearer Auth', authorizations=authorizations)
 
-# ns_user = api.namespace('users', description='User management')
+ns_network_management = api.namespace(
+    'network_management', description='Network Manager')
 
 
 @app.before_first_request
@@ -240,6 +241,47 @@ class Login(Resource):
             return make_response(jsonify({"msg": "Invalid credentials"}), 401)
 
 
+@ns_network_management.route('/add-server-group')
+class AddServerGroup(Resource):
+
+    add_server_group_fields = api.model('Add Server Group', {
+        'name': fields.String(description='Name', required=True),
+        'organization': fields.String(description='Organization', required=True),
+        'category': fields.String(description='Category', required=True),
+        'lower_ip_range': fields.String(description='Lower IP Range', required=True),
+        'upper_ip_range': fields.String(description='Upper IP Range', required=True),
+        'Description': fields.String(description='Description', required=True),
+
+    })
+
+    @ns_network_management.doc(body=add_server_group_fields)
+    @jwt_required
+    def post(self):
+        """
+        Create a new server group
+        """
+
+        name = request.json.get("name")
+        organization = request.json.get("organization")
+        category = request.json.get('category')
+        lower_ip_range = request.json.get('lower_ip_range')
+        upper_ip_range = request.json.get('upper_ip_range')
+        description = request.json.get('description')
+
+        server_group = ServerGroup.query.filter_by(name=name).first()
+
+        if not server_group:  # If no server group exists with that name, then create a new one
+            server_group = ServerGroup(name=name, organization=organization, category=category,
+                               lower_ip_range=lower_ip_range, upper_ip_range=upper_ip_range, description=description)
+            db.session.add(server_group)
+            db.session.commit()
+            ret = {'msg': 'Success'}
+            return make_response(jsonify(ret), 200)
+
+        else:
+            return make_response(jsonify({"msg": "Server Group with that name already exists, please try again with a new name."}), 400)
+
+
 # In a protected view, get the claims you added to the jwt with the
 # get_jwt_claims() method
 @api.route('/protected')
@@ -256,23 +298,24 @@ class TestProtectedMethod(Resource):
         }), 200)
 
 
-class ServerNode(ABC):
-    @abstractmethod
-    def createNode(self):
-        pass
+# class ServerNode(ABC):
+#    @abstractmethod
+#    def createNode(self):
+#        pass
 
 
 @api.route('/setup', methods=['GET', 'POST'])
-class GetForm(ServerNode):
+# class GetForm(ServerNode):
+class GetForm(Resource):
     @jwt_required
     def createNode(self):
         id = ""
         name = ""
         log = ""
         dateCreated = ""
-        #TODO Get the proper data to setup
+        # TODO Get the proper data to setup
         #data = request.form["id"]
-        #return jsonify({'ip': request.remote_addr}), 200
+        # return jsonify({'ip': request.remote_addr}), 200
 
 
 if __name__ == '__main__':

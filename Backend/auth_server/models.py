@@ -40,6 +40,47 @@ class User(db.Model):
             'id': self.id,
         }
 
+class ServerGroup(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+    organization = db.Column(db.String(100))
+    category = db.Column(db.String(55))
+    lower_ip_range = db.Column(db.String(30))
+    upper_ip_range = db.Column(db.String(30))
+    description = db.Column(db.String(150))
+
+    def get_id(self):
+        return self.id
+
+    def get_name(self):
+        return self.name
+
+    def get_organization(self):
+        return self.organization
+
+    def get_category(self):
+        return self.category
+
+    def get_lower_ip_range(self):
+        return self.lower_ip_range
+
+    def get_upper_ip_range(self):
+        return self.upper_ip_range
+
+    def get_description(self):
+        return self.description
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name, 
+            'organization': self.organization,
+            'category': self.category,
+            'lower_ip_range': self.lower_ip_range,
+            'upper_ip_range': self.upper_ip_range,
+            'description': self.description,
+        }
+
 
 class OAuth2Token(db.Model):
     __tablename__ = 'oauth2_token'
