@@ -4,10 +4,10 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_claims, current_user
 )
-from models import db, User, ServerGroup
+from models import db, User, ServerGroup, Organization
 from flask_restplus import Api, Resource, fields
 from flask_cors import CORS
-#from abc import ABC, abstractmethod
+# from abc import ABC, abstractmethod
 import datetime
 
 
@@ -33,6 +33,9 @@ api = Api(app, security='Bearer Auth', authorizations=authorizations)
 ns_server_group = api.namespace(
     'server-group', description='API calls for server groups')
 
+ns_organization = api.namespace(
+    'organization', description='API calls for organizations'
+)
 
 @app.before_first_request
 def create_tables():
@@ -240,6 +243,7 @@ class Login(Resource):
         else:
             return make_response(jsonify({"msg": "Invalid credentials"}), 401)
 
+
 @ns_server_group.route('/all')
 class GetServerGroups(Resource):
 
@@ -256,6 +260,50 @@ class GetServerGroups(Resource):
 
         # returns list of server groups as json response
         return make_response(jsonify(size=size, server_groups=[server_group.serialize() for server_group in server_groups]))
+
+
+@ns_organization.route('/all')
+class GetOrganizations(Resource):
+    @jwt_required
+    def get(self):
+        """
+        Returns a list of all Organizations
+        """
+
+        # get all organizations from db
+        organization = Organization.query.all()
+
+        size = len(organization)
+
+        # returns list of Organizations as json response
+        return make_response(jsonify(size=size, organization=[organization.serialize() for organization in organization]))
+
+@ns_organization.route('/create')
+class AddOrganization(Resource):
+    add_organization_fields = api.model('Add Organization', {
+        'name': fields.String(descreption='Name', required=True)
+    })
+
+    @ns_organization.doc(body=add_organization_fields)
+    @jwt_required
+    def post(self):
+        """
+        Create a new Organization
+        """
+
+        name = request.json.get("name")
+
+        organization = Organization.query.filter_by(name=name).first()
+
+        if not organization:  # If no organization exists with that name, then create a new one
+            organization = Organization(name=name)
+            db.session.add(organization)
+            db.session.commit()
+            ret = {'msg': 'Success'}
+            return make_response(jsonify(ret), 200)
+
+        else:
+            return make_response(jsonify({"msg": "Organization with that name already exists, please try again with a new name."}), 400)
 
 
 @ns_server_group.route('/create')
@@ -289,7 +337,7 @@ class AddServerGroup(Resource):
 
         if not server_group:  # If no server group exists with that name, then create a new one
             server_group = ServerGroup(name=name, organization=organization, category=category,
-                               lower_ip_range=lower_ip_range, upper_ip_range=upper_ip_range, description=description)
+                                       lower_ip_range=lower_ip_range, upper_ip_range=upper_ip_range, description=description)
             db.session.add(server_group)
             db.session.commit()
             ret = {'msg': 'Success'}
@@ -315,7 +363,7 @@ class GetForm(Resource):
         log = ""
         dateCreated = ""
         # TODO Get the proper data to setup
-        #data = request.form["id"]
+        # data = request.form["id"]
         # return jsonify({'ip': request.remote_addr}), 200
 
 

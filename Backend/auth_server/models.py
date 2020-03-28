@@ -9,7 +9,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(55))
     last_name = db.Column(db.String(55))
-    password = db.Column(db.String(100)) # hashed password
+    password = db.Column(db.String(100))  # hashed password
     email = db.Column(db.String(140), unique=True)
     role = db.Column(db.String(15))
 
@@ -29,16 +29,35 @@ class User(db.Model):
         return self.last_name
 
     def check_password(self, password):
-        return check_password_hash(self.password, password) # checks if hash password in db matches password
+        # checks if hash password in db matches password
+        return check_password_hash(self.password, password)
 
     def serialize(self):
         return {
-            'first_name': self.first_name, 
+            'first_name': self.first_name,
             'last_name': self.last_name,
             'email': self.email,
             'role': self.role,
             'id': self.id,
         }
+
+
+class Organization(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100))
+
+    def get_id(self):
+        return self.id
+
+    def get_name(self):
+        return self.name
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class ServerGroup(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -73,7 +92,7 @@ class ServerGroup(db.Model):
     def serialize(self):
         return {
             'id': self.id,
-            'name': self.name, 
+            'name': self.name,
             'organization': self.organization,
             'category': self.category,
             'lower_ip_range': self.lower_ip_range,
