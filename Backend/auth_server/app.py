@@ -37,6 +37,7 @@ ns_organization = api.namespace(
     'organization', description='API calls for organizations'
 )
 
+
 @app.before_first_request
 def create_tables():
     db.create_all()
@@ -278,6 +279,7 @@ class GetOrganizations(Resource):
         # returns list of Organizations as json response
         return make_response(jsonify(size=size, organization=[organization.serialize() for organization in organization]))
 
+
 @ns_organization.route('/create')
 class AddOrganization(Resource):
     add_organization_fields = api.model('Add Organization', {
@@ -335,7 +337,10 @@ class AddServerGroup(Resource):
 
         server_group = ServerGroup.query.filter_by(name=name).first()
 
-        if not server_group:  # If no server group exists with that name, then create a new one
+        # Check for if the organization given from user exists
+        temp = Organization.query.filter_by(name=organization).first()
+
+        if not server_group and temp is not None:  # If no server group exists with that name, then create a new one
             server_group = ServerGroup(name=name, organization=organization, category=category,
                                        lower_ip_range=lower_ip_range, upper_ip_range=upper_ip_range, description=description)
             db.session.add(server_group)
@@ -344,7 +349,7 @@ class AddServerGroup(Resource):
             return make_response(jsonify(ret), 200)
 
         else:
-            return make_response(jsonify({"msg": "Server Group with that name already exists, please try again with a new name."}), 400)
+            return make_response(jsonify({"msg": "Server Group with that name already exists or Organization name is invalid, please try again with a new name."}), 400)
 
 
 # class ServerNode(ABC):
