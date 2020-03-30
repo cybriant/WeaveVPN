@@ -398,7 +398,7 @@ class AddOrganization(Resource):
         name = request.json.get("name")
         network_id = request.json.get('network_id')
 
-        organization = Organization.query.filter_by(name=name).first()
+        organization = Organization.query.filter_by(name=name,network_id=network_id).first()
 
         if not organization:  # If no organization exists with that name, then create a new one
             organization = Organization(id=id, name=name, network_id=network_id)
