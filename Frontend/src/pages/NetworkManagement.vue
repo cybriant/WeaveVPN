@@ -3,97 +3,129 @@
     <div class="container-fluid">
       <div class="row">
         <div class="col-md-12">
-          <card>
-            <h4 style="margin-top: 0;">Network Management</h4>
-
-
-            <!-- CREATE SERVER GROUP MODAL -->
-
-            <v-dialog v-model="dialog" persistent max-width="600px">
-              <template v-slot:activator="{ on }">
-                <v-btn color="primary" dark v-on="on" style="margin-bottom: 20px;">Create Server Group</v-btn>
-              </template>
-              <v-card>
-                <v-card-title>
-                  <span class="headline">Create Server Group</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-container>
-                    <v-row>
-                      <v-col cols="12">
-                        <v-text-field label="Name" v-model="server_group_item.name" required></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field label="Organization" v-model="server_group_item.organization" required></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6" md="6">
-                        <v-text-field label="Category" v-model="server_group_item.category"></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-text-field label="Lower IP Range" hint="ex 192.168.0.1" v-model="server_group_item.lower_ip_range" required></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-text-field label="Upper IP Range" hint="ex 192.168.10.100" v-model="server_group_item.upper_ip_range" required></v-text-field>
-                      </v-col>
-                      <v-col cols="12">
-                        <v-text-field label="Description" v-model="server_group_item.description"></v-text-field>
-                      </v-col>
-                    </v-row>
-                  </v-container>
-                </v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="grey darken-1" text @click="dialog = false">Cancel</v-btn>
-                  <v-btn color="primary" outlined @click="addServerGroup">Create</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-
-            <!-- END OF SERVER GROUP MODAL --> 
+          
 
             <v-data-table
               :headers="headers"
-              :items="server_groups"
+              :items="networks"
               :search="search"
               sort-by="Name"
               class="elevation-1"
             >
+
+              <template v-slot:top>
+                <v-toolbar flat color="white" style="border-radius: 100px;">
+                  <h4>Network Management</h4>
+                </v-toolbar>
+      
+                <v-toolbar flat color="white">
+                  <!-- Start of dialog -->
+                  <v-dialog v-model="dialog" max-width="500px">
+                    <template v-slot:activator="{ on }">
+                      <v-btn color="primary" dark class="mb-2" v-on="on">
+                        <v-icon style="padding-right: 5px;">mdi-plus</v-icon>Create Network
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">{{ formTitle }}</span>
+                      </v-card-title>
+
+                      <v-card-text>
+                        <v-container>
+                          <v-row>
+                            <v-col cols="12" sm="12" md="12">
+                              <v-text-field v-model="editedItem.name" label="Name"></v-text-field>
+                              <input v-model="editedItem.id" hidden />
+                            </v-col>
+                            <v-col cols="12" sm="12" md="12">
+                              <v-text-field v-model="editedItem.description" label="Description"></v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card-text>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="grey darken-1" text @click="close">Cancel</v-btn>
+                        <v-btn color="primary" outlined @click="save">{{ submitBtn }}</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+
+                  <!-- End of dialog -->
+
+                  <v-spacer></v-spacer>
+                  <v-spacer></v-spacer>
+                  <v-text-field
+                    style="clear: both;"
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-toolbar>
+              </template>
+
+              <template v-slot:item.name="{ item }">
+                <router-link :to="'/admin/network?name='+ item.name + '&id=' + item.id">{{ item.name }}</router-link>
+              </template>
+
+              <template v-slot:item.action="{ item }">
+                <v-icon class="mr-2" @click="editItem(item)" title="Edit Network">edit</v-icon>
+                <v-icon @click="deleteItem(item)" title="Delete Network">delete</v-icon>
+              </template>
             </v-data-table>
-          </card>
+          
         </div>
       </div>
     </div>
   </div>
 </template>
 <script>
-
+import { v4 as uuidv4 } from 'uuid';
 export default {
-  components: {},
   data: () => ({
-    dialog: false,
-    server_group_item: {},
-    server_groups: [],
     search: "",
+    dialog: false,
     headers: [
       { text: "Name", value: "name" },
-      { text: "Organization", value: "organization" },
-      { text: "Category", value: "category" },
-      { text: "Lower IP Range", value: "lower_ip_range" },
-      { text: "Upper IP Range", value: "upper_ip_range" },
-      { text: "Description", value: "description" }
+      { text: "Description", value: "description" },
+      { text: "Actions", value: "action", sortable: false }
     ],
-
+    networks: [],
+    editedIndex: -1,
+    editedItem: {},
+    defaultItem: {}
   }),
-  created() {
-    this.getServerGroups();
+
+  computed: {
+    formTitle() {
+      return this.editedIndex === -1 ? "Add New Network" : "Edit Network";
+    },
+    submitBtn() {
+      return this.editedIndex === -1 ? "Add" : "Update";
+    }
   },
+
+  watch: {
+    dialog(val) {
+      val || this.close();
+    }
+  },
+
+  created() {
+    this.initialize();
+  },
+
   methods: {
-    getServerGroups() {
+    initialize() {
       this.$http
-        .get("http://127.0.0.1:5000/server-group/all")
+        .get("http://127.0.0.1:5000/network/all")
         .then(({ data }) => {
-          // Adds the users from the database to the table
-          this.server_groups = data.server_groups;
+          // Adds the networks from the database to the table
+          this.networks = data.networks;
         })
         .catch(err => {
           console.log(err.response.data);
@@ -105,23 +137,91 @@ export default {
           });
         });
     },
-    addServerGroup() {
-      this.$http
-          .post("http://127.0.0.1:5000/server-group/create", {
-            name: this.server_group_item.name,
-            organization: this.server_group_item.organization,
-            category: this.server_group_item.category,
-            lower_ip_range: this.server_group_item.lower_ip_range,
-            upper_ip_range: this.server_group_item.upper_ip_range,
-            description: this.server_group_item.description
-          })
+
+    editItem(item) {
+      this.editedIndex = this.networks.indexOf(item);
+      this.editedItem = Object.assign({}, item);
+      this.dialog = true;
+    },
+
+    deleteItem(item) {
+      const index = this.networks.indexOf(item); // gets index of network in table
+
+      confirm("Are you sure you want to delete this network?") &&
+        this.$http
+          .delete("http://127.0.0.1:5000/network/delete/" + item.id)
           .then(({ data }) => {
-            this.server_groups.push(this.server_group_item); // add server group to table (frontend)
-            this.dialog = false,
+            this.networks.splice(index, 1); // remove network from table
             this.$notify({
               group: "foo",
               title: "Success!",
-              text: "Server group has been successfully created!",
+              text: "Network has been successfully deleted!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data.msg,
+              type: "error"
+            });
+          });
+    },
+
+    close() {
+      this.dialog = false;
+      setTimeout(() => {
+        this.editedItem = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      }, 300);
+    },
+
+    save() {
+      if (this.editedIndex > -1) {
+        // update network and save to db
+        this.$http
+          .put(
+            "http://127.0.0.1:5000/network/update/" +
+              this.editedItem.id,
+            {
+              name: this.editedItem.name,
+              description: this.editedItem.description
+            }
+          )
+          .then(({ data }) => {
+            Object.assign(this.networks[this.editedIndex], this.editedItem); // update table info (frontend)
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "Network has been successfully updated!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data.msg,
+              type: "error"
+            });
+          });
+      } else {
+        var uuid = uuidv4();
+        // create new network and save to db
+        this.$http
+          .post("http://127.0.0.1:5000/network/create", {
+            id: uuid,
+            name: this.editedItem.name,
+            description: this.editedItem.description
+          })
+          .then(({ data }) => {
+            this.editedItem.id = uuid,
+            this.networks.push(this.editedItem); // add network to table (frontend)
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "Network has been successfully created!",
               type: "success"
             });
           })
@@ -134,15 +234,19 @@ export default {
               type: "error"
             });
           });
-    },
-
+      }
+      this.close();
+    }
   }
-  // mounted () {
-  // this.$http
-  //   .get('http://127.0.0.1:5000/api/login')
-  //   .then(response => (this.info = response.data.email))
-  // }
 };
 </script>
 <style>
+.v-data-table {
+    border-radius: 0.25rem;
+    border: 1px solid rgba(0, 0, 0, 0.125);
+}
+.v-application .elevation-1 {
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
+}
 </style>

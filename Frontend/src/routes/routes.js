@@ -8,6 +8,7 @@ import LoginUser from '../pages/Login.vue'
 import Overview from 'src/pages/Overview.vue'
 import UserProfile from 'src/pages/UserProfile.vue'
 import NetworkManagement from 'src/pages/NetworkManagement.vue'
+import Network from 'src/pages/Network.vue'
 import UserManagement from 'src/pages/UserManagement.vue'
 import Settings from 'src/pages/Settings.vue'
 import Help from 'src/pages/Help.vue'
@@ -59,6 +60,11 @@ const routes = [
         path: 'network-management',
         name: 'Network Management',
         component: NetworkManagement
+      },
+      {
+        path: 'network',
+        name: 'Network',
+        component: Network
       },
       {
         path: 'settings',

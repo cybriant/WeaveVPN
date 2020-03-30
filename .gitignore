@@ -13,3 +13,4 @@ package-lock.json
 *.idea
 Backend/get-pip.py
 Frontend/yarn.lock
+Frontend/src/pages/Network2.vue

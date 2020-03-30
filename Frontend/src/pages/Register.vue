@@ -40,6 +40,7 @@
 </template>
 
 <script>
+import { v4 as uuidv4 } from 'uuid';
 export default {
   data() {
     return {
@@ -54,6 +55,7 @@ export default {
     register() {
       this.$store
         .dispatch("register", {
+          id: uuidv4(),
           first_name: this.first_name,
           last_name: this.last_name,
           email: this.email,

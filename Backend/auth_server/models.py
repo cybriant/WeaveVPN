@@ -6,7 +6,7 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)
     first_name = db.Column(db.String(55))
     last_name = db.Column(db.String(55))
     password = db.Column(db.String(100))  # hashed password
@@ -41,9 +41,8 @@ class User(db.Model):
             'id': self.id,
         }
 
-
-class Organization(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+class Network(db.Model):
+    id = db.Column(db.String(100), primary_key=True)
     name = db.Column(db.String(100))
 
     def get_id(self):
@@ -59,14 +58,37 @@ class Organization(db.Model):
         }
 
 
+class Organization(db.Model):
+    id = db.Column(db.String(100), primary_key=True)
+    name = db.Column(db.String(100))
+    network_id = db.Column(db.String(100))
+
+    def get_id(self):
+        return self.id
+
+    def get_name(self):
+        return self.name
+
+    def get_network_id(self):
+        return self.network_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'network_id': self.network_id
+        }
+
+
 class ServerGroup(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String(100), primary_key=True)
     name = db.Column(db.String(100))
     organization = db.Column(db.String(100))
     category = db.Column(db.String(55))
     lower_ip_range = db.Column(db.String(30))
     upper_ip_range = db.Column(db.String(30))
     description = db.Column(db.String(150))
+    network_id = db.Column(db.String(100))
 
     def get_id(self):
         return self.id
@@ -89,6 +111,9 @@ class ServerGroup(db.Model):
     def get_description(self):
         return self.description
 
+    def get_network_id(self):
+        return self.network_id
+
     def serialize(self):
         return {
             'id': self.id,
@@ -98,6 +123,7 @@ class ServerGroup(db.Model):
             'lower_ip_range': self.lower_ip_range,
             'upper_ip_range': self.upper_ip_range,
             'description': self.description,
+            'network_id': self.network_id,
         }
 
 
