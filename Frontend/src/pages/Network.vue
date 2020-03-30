@@ -32,8 +32,12 @@
                       <v-container>
                         <v-row>
                           <v-col cols="12">
-                            <v-text-field label="Organization Name" v-model="organization_item.name" required></v-text-field>
-                            <input v-model="organization_item.id" hidden/>
+                            <v-text-field
+                              label="Organization Name"
+                              v-model="organization_item.name"
+                              required
+                            ></v-text-field>
+                            <input v-model="organization_item.id" hidden />
                           </v-col>
                           <v-col cols="12">
                             <v-text-field
@@ -83,7 +87,7 @@
                         <v-row>
                           <v-col cols="12">
                             <v-text-field label="Name" v-model="server_group_item.name" required></v-text-field>
-                            <input v-model="server_group_item.id" hidden/>
+                            <input v-model="server_group_item.id" hidden />
                           </v-col>
                           <v-col cols="12" sm="12">
                             <v-text-field
@@ -152,7 +156,7 @@
   </div>
 </template>
 <script>
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 export default {
   components: {},
   data: () => ({
@@ -161,7 +165,7 @@ export default {
     organizations: [],
     organizations_headers: [
       { text: "Organization Name", value: "name" },
-      { text: "Description", value: "description" },
+      { text: "Description", value: "description" }
     ],
     server_groups_dialog: false,
     server_group_item: {},
@@ -185,7 +189,6 @@ export default {
     }
   },
   methods: {
-
     getOrganizations() {
       this.$http
         .get("http://127.0.0.1:5000/organization/all/" + this.$route.query.id)
@@ -210,16 +213,15 @@ export default {
           id: uuid,
           name: this.organization_item.name,
           description: this.organization_item.description,
-          network_id: this.$route.query.id,
+          network_id: this.$route.query.id
         })
         .then(({ data }) => {
           this.organization_item.id = uuid,
-          this.organizations.push(this.organization_item); // add server group to table (frontend)
-          (this.organizations_dialog = false),
+            this.organizations.push(this.organization_item); // add organization to table (frontend)
             this.$notify({
               group: "foo",
               title: "Success!",
-              text: "Server group has been successfully created!",
+              text: "Organization has been successfully created!",
               type: "success"
             });
         })
@@ -232,6 +234,11 @@ export default {
             type: "error"
           });
         });
+        this.organizations_dialog = false;
+        setTimeout(() => {
+          this.organization_item = Object.assign({}, this.defaultItem);
+          this.editedIndex = -1;
+        }, 300);
     },
 
     getServerGroups() {
@@ -262,12 +269,11 @@ export default {
           lower_ip_range: this.server_group_item.lower_ip_range,
           upper_ip_range: this.server_group_item.upper_ip_range,
           description: this.server_group_item.description,
-          network_id: this.$route.query.id,
+          network_id: this.$route.query.id
         })
         .then(({ data }) => {
-          this.server_group_item.id = uuid,
-          this.server_groups.push(this.server_group_item), // add server group to table (frontend)
-          (this.server_groups_dialog = false),
+            this.server_group_item.id = uuid,
+            this.server_groups.push(this.server_group_item); // add server group to table (frontend)
             this.$notify({
               group: "foo",
               title: "Success!",
@@ -284,6 +290,11 @@ export default {
             type: "error"
           });
         });
+        this.server_groups_dialog = false;
+          setTimeout(() => {
+            this.server_group_item = Object.assign({}, this.defaultItem);
+            this.editedIndex = -1;
+        }, 300);
     }
   }
   // mounted () {
