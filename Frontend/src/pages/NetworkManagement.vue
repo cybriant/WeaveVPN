@@ -23,7 +23,7 @@
                   <v-dialog v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
-                        <v-icon style="padding-right: 5px;">mdi-plus</v-icon>Create Network
+                        <v-icon>mdi-plus</v-icon>Create Network
                       </v-btn>
                     </template>
                     <v-card>

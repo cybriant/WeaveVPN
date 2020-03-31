@@ -14,56 +14,75 @@
 
               <!-- ORGANIZATIONS TAB -->
               <v-tab-item style="margin-top: 1rem;">
-                <!-- ORGANIZATIONS MODAL -->
-                <v-dialog v-model="organizations_dialog" persistent max-width="600px">
-                  <template v-slot:activator="{ on }">
-                    <v-btn
-                      color="primary"
-                      dark
-                      v-on="on"
-                      style="margin-bottom: 20px;"
-                    >Create Organization</v-btn>
-                  </template>
-                  <v-card>
-                    <v-card-title>
-                      <span class="headline">Create Organization</span>
-                    </v-card-title>
-                    <v-card-text>
-                      <v-container>
-                        <v-row>
-                          <v-col cols="12">
-                            <v-text-field
-                              label="Organization Name"
-                              v-model="organization_item.name"
-                              required
-                            ></v-text-field>
-                            <input v-model="organization_item.id" hidden />
-                          </v-col>
-                          <v-col cols="12">
-                            <v-text-field
-                              label="Description"
-                              v-model="organization_item.description"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                    </v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="grey darken-1" text @click="organizations_dialog = false">Cancel</v-btn>
-                      <v-btn color="primary" outlined @click="addOrganization">Create</v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-dialog>
-                <!-- END OF ORGANIZATIONS MODAL -->
+                <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
+
+                  <!-- ORGANIZATIONS MODAL -->
+                  <v-dialog v-model="organizations_dialog" persistent max-width="600px">
+                    <template v-slot:activator="{ on }">
+                      <v-btn color="primary" dark class="mb-2" v-on="on">
+                        <v-icon>mdi-plus</v-icon>Create Organization
+                      </v-btn>
+                    </template>
+                    <v-card>
+                      <v-card-title>
+                        <span class="headline">{{ formOrgTitle }}</span>
+                      </v-card-title>
+
+                      <v-card-text>
+                        <v-container>
+                          <v-row>
+                            <v-col cols="12">
+                              <v-text-field
+                                label="Organization Name"
+                                v-model="organization_item.name"
+                                required
+                              ></v-text-field>
+                              <input v-model="organization_item.id" hidden />
+                            </v-col>
+                            <v-col cols="12">
+                              <v-text-field
+                                label="Description"
+                                v-model="organization_item.description"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card-text>
+
+                      <v-card-actions>
+                        <v-spacer></v-spacer>
+                        <v-btn color="grey darken-1" text @click="closeOrgDialog()">Cancel</v-btn>
+                        <v-btn color="primary" outlined @click="saveOrg()">{{ submitOrgBtn }}</v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </v-dialog>
+                  <!-- END OF ORGANIZATIONS MODAL -->
+
+                  <v-spacer></v-spacer>
+                  <v-spacer></v-spacer>
+
+                  <v-text-field
+                    style="clear: both;"
+                    v-model="organizations_search"
+                    append-icon="mdi-magnify"
+                    label="Search"
+                    single-line
+                    hide-details
+                  ></v-text-field>
+                </v-row>
 
                 <v-data-table
                   :headers="organizations_headers"
                   :items="organizations"
-                  :search="search"
+                  :search="organizations_search"
                   sort-by="Name"
                   class="elevation-1"
-                ></v-data-table>
+                >
+                  <template v-slot:item.action="{ item }">
+                    <v-icon class="mr-2" @click="editOrgItem(item)" title="Edit Network">edit</v-icon>
+                    <v-icon @click="deleteOrgItem(item)" title="Delete Network">delete</v-icon>
+                  </template>
+                </v-data-table>
               </v-tab-item>
 
               <!-- SERVER GROUPS TAB -->
@@ -133,7 +152,7 @@
                 <v-data-table
                   :headers="server_group_headers"
                   :items="server_groups"
-                  :search="search"
+                  :search="server_group_search"
                   sort-by="Name"
                   class="elevation-1"
                 ></v-data-table>
@@ -160,17 +179,21 @@ import { v4 as uuidv4 } from "uuid";
 export default {
   components: {},
   data: () => ({
+    editedOrgIndex: -1,
+    defaultOrgItem: {},
     organizations_dialog: false,
     organization_item: {},
     organizations: [],
+    organizations_search: "",
     organizations_headers: [
       { text: "Organization Name", value: "name" },
-      { text: "Description", value: "description" }
+      { text: "Description", value: "description" },
+      { text: "Actions", value: "action", sortable: false }
     ],
     server_groups_dialog: false,
     server_group_item: {},
     server_groups: [],
-    search: "",
+    server_group_search: "",
     server_group_headers: [
       { text: "Name", value: "name" },
       { text: "Organization", value: "organization" },
@@ -179,6 +202,7 @@ export default {
       { text: "Description", value: "description" }
     ]
   }),
+
   created() {
     this.getServerGroups();
     this.getOrganizations();
@@ -186,6 +210,12 @@ export default {
   computed: {
     network_name() {
       return this.$route.query.name;
+    },
+    formOrgTitle() {
+      return this.editedOrgIndex === -1 ? "Add New Organization" : "Edit Organization";
+    },
+    submitOrgBtn() {
+      return this.editedOrgIndex === -1 ? "Add" : "Update";
     }
   },
   methods: {
@@ -206,40 +236,112 @@ export default {
           });
         });
     },
-    addOrganization() {
-      var uuid = uuidv4();
-      this.$http
-        .post("http://127.0.0.1:5000/organization/create", {
-          id: uuid,
-          name: this.organization_item.name,
-          description: this.organization_item.description,
-          network_id: this.$route.query.id
-        })
-        .then(({ data }) => {
-          this.organization_item.id = uuid,
-            this.organizations.push(this.organization_item); // add organization to table (frontend)
+
+    editOrgItem(item) {
+      this.editedOrgIndex = this.organizations.indexOf(item);
+      this.organization_item = Object.assign({}, item);
+      this.organizations_dialog = true;
+    },
+
+    deleteOrgItem(item) {
+      const index = this.organizations.indexOf(item); // gets index of user in table
+
+      confirm("Are you sure you want to delete this organization?") &&
+        this.$http
+          .delete("http://127.0.0.1:5000/organization/delete/" + item.id)
+          .then(({ data }) => {
+            this.organizations.splice(index, 1); // remove user from table
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "Organization has been successfully deleted!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data.msg,
+              type: "error"
+            });
+          });
+    },
+
+    closeOrgDialog() {
+      this.organizations_dialog = false;
+      setTimeout(() => {
+        this.organization_item = Object.assign({}, this.defaultOrgItem);
+        this.editedOrgIndex = -1;
+      }, 300);
+    },
+
+    saveOrg() {
+      if (this.editedOrgIndex > -1) {
+        // update org and save to db
+        this.$http
+          .put(
+            "http://127.0.0.1:5000/organization/update/" +
+              this.organization_item.id,
+            {
+              name: this.organization_item.name,
+              description: this.organization_item.description,
+              network_id: this.$route.query.id
+            }
+          )
+          .then(({ data }) => {
+            Object.assign(
+              this.organizations[this.editedOrgIndex],
+              this.organization_item
+            ); // update table info (frontend)
+            this.$notify({
+              group: "foo",
+              title: "Success!",
+              text: "Organization has been successfully updated!",
+              type: "success"
+            });
+          })
+          .catch(err => {
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data.msg,
+              type: "error"
+            });
+          });
+      } else {
+        var uuid = uuidv4();
+        this.$http
+          .post("http://127.0.0.1:5000/organization/create", {
+            id: uuid,
+            name: this.organization_item.name,
+            description: this.organization_item.description,
+            network_id: this.$route.query.id
+          })
+          .then(({ data }) => {
+            (this.organization_item.id = uuid),
+              this.organizations.push(this.organization_item); // add organization to table (frontend)
             this.$notify({
               group: "foo",
               title: "Success!",
               text: "Organization has been successfully created!",
               type: "success"
             });
-        })
-        .catch(err => {
-          this.error = err.response.data;
-          this.$notify({
-            group: "foo",
-            title: "Error",
-            text: err.response.data.msg,
-            type: "error"
+          })
+          .catch(err => {
+            this.error = err.response.data;
+            this.$notify({
+              group: "foo",
+              title: "Error",
+              text: err.response.data.msg,
+              type: "error"
+            });
           });
-        });
-        this.organizations_dialog = false;
-        setTimeout(() => {
-          this.organization_item = Object.assign({}, this.defaultItem);
-          this.editedIndex = -1;
-        }, 300);
+      }
+      this.closeOrgDialog()
     },
+
+  
 
     getServerGroups() {
       this.$http
@@ -272,14 +374,14 @@ export default {
           network_id: this.$route.query.id
         })
         .then(({ data }) => {
-            this.server_group_item.id = uuid,
+          (this.server_group_item.id = uuid),
             this.server_groups.push(this.server_group_item); // add server group to table (frontend)
-            this.$notify({
-              group: "foo",
-              title: "Success!",
-              text: "Server group has been successfully created!",
-              type: "success"
-            });
+          this.$notify({
+            group: "foo",
+            title: "Success!",
+            text: "Server group has been successfully created!",
+            type: "success"
+          });
         })
         .catch(err => {
           this.error = err.response.data;
@@ -290,18 +392,13 @@ export default {
             type: "error"
           });
         });
-        this.server_groups_dialog = false;
-          setTimeout(() => {
-            this.server_group_item = Object.assign({}, this.defaultItem);
-            this.editedIndex = -1;
-        }, 300);
+      this.server_groups_dialog = false;
+      setTimeout(() => {
+        this.server_group_item = Object.assign({}, this.defaultItem);
+        this.editedIndex = -1;
+      }, 300);
     }
   }
-  // mounted () {
-  // this.$http
-  //   .get('http://127.0.0.1:5000/api/login')
-  //   .then(response => (this.info = response.data.email))
-  // }
 };
 </script>
 <style>

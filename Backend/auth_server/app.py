@@ -189,6 +189,8 @@ class UpdateUser(Resource):
         Update a user
         """
 
+        user = User.query.filter_by(id=id).first()
+
         first_name = request.json.get("first_name")
         last_name = request.json.get("last_name")
         email = request.json.get('email')
@@ -196,11 +198,10 @@ class UpdateUser(Resource):
 
         temp = User.query.filter_by(email=email).first()
 
-        if temp:
+        if temp and temp.id != user.id:
             ret = {'msg': 'A user with that email already exists, please use a new email.'}
             return make_response(jsonify(ret), 400)
 
-        user = User.query.filter_by(id=id).first()
 
         if user:
             user.first_name = first_name
@@ -324,7 +325,7 @@ class UpdateNetwork(Resource):
 
         temp = Network.query.filter_by(name=name).first()
 
-        if temp: # if network with that name already exists, return error
+        if temp and temp.id != network.id: # if network with that name already exists, return error
             ret = {'msg': 'Network name must be unique, please enter a new name.'}
             return make_response(jsonify(ret), 400)
 
@@ -369,7 +370,7 @@ class GetOrganizations(Resource):
     @jwt_required
     def get(self, network_id):
         """
-        Returns a list of all Organizations
+        Returns a list of all organizations within a network
         """
 
         # get all organizations from db
@@ -409,6 +410,80 @@ class AddOrganization(Resource):
 
         else:
             return make_response(jsonify({"msg": "Organization with that name already exists, please try again with a new name."}), 400)
+
+@ns_organization.route('/update/<id>')
+class UpdateOrganization(Resource):
+    add_organization_fields = api.model('Add Organization', {
+        'id': fields.String(descreption='Id', required=True),
+        'name': fields.String(descreption='Name', required=True),
+        'network_id': fields.String(descreption='Network Id', required=True)
+    })
+
+    @ns_organization.doc(body=add_organization_fields)
+    @jwt_required
+    def put(self, id):
+        """
+        Update an Organization
+        """
+
+        organization = Organization.query.filter_by(id=id).first()
+
+        id = request.json.get('id')
+        name = request.json.get("name")
+        network_id = request.json.get('network_id')
+
+        temp = Organization.query.filter_by(name=name).first()
+
+        if temp and temp.id != organization.id: # if organization with that name already exists, return error
+            ret = {'msg': 'Organization name must be unique, please enter a new name.'}
+            return make_response(jsonify(ret), 400)
+
+        description = request.json.get("description")
+
+        if organization:
+            organization.name = name
+            organization.description = description
+            db.session.commit()
+            return make_response(jsonify({"msg": "Successfully updated organization!"}), 200)
+        else:
+            ret = {'msg': 'Organization not found in database'}
+            return make_response(jsonify(ret), 400)
+        
+
+        organization = Organization.query.filter_by(name=name,network_id=network_id).first()
+
+        if not organization:  # If no organization exists with that name, then create a new one
+            organization = Organization(id=id, name=name, network_id=network_id)
+            db.session.add(organization)
+            db.session.commit()
+            ret = {'msg': 'Success'}
+            return make_response(jsonify(ret), 200)
+
+        else:
+            return make_response(jsonify({"msg": "Organization with that name already exists, please try again with a new name."}), 400)
+
+
+@ns_organization.route('/delete/<id>')
+@ns_organization.doc(params={'id': ''})
+class DeleteOrganization(Resource):
+
+    @jwt_required
+    def delete(self, id):
+        """
+        Delete an organization
+        """
+
+        organization = Organization.query.filter_by(id=id).first()
+
+        if not organization:  # If no organizstion exists with that name, then return error
+            ret = {'msg': 'Organization not found in database'}
+            return make_response(jsonify(ret), 400)
+
+        else:
+            db.session.delete(organization)
+            db.session.commit()
+            ret = {'msg': 'Successfully deleted organization'}
+            return make_response(jsonify(ret), 200)
 
 
 @ns_server_group.route('/all/<network_id>')
