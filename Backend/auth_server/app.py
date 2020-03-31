@@ -553,26 +553,5 @@ class AddServerGroup(Resource):
         else:
             return make_response(jsonify({"msg": "Server Group with that name already exists, please try again with a new name."}), 400)
 
-
-# class ServerNode(ABC):
-#    @abstractmethod
-#    def createNode(self):
-#        pass
-
-
-# @api.route('/setup', methods=['GET', 'POST'])
-# class GetForm(ServerNode):
-# class GetForm(Resource):
-#    @jwt_required
-#    def createNode(self):
-#        id = ""
-#        name = ""
-#        log = ""
-#        dateCreated = ""
-        # TODO Get the proper data to setup
-        # data = request.form["id"]
-        # return jsonify({'ip': request.remote_addr}), 200
-
-
 if __name__ == '__main__':
     app.run()
