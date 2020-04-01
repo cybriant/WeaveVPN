@@ -413,13 +413,12 @@ class AddOrganization(Resource):
 
 @ns_organization.route('/update/<id>')
 class UpdateOrganization(Resource):
-    add_organization_fields = api.model('Add Organization', {
-        'id': fields.String(descreption='Id', required=True),
+    update_organization_fields = api.model('Update Organization', {
         'name': fields.String(descreption='Name', required=True),
-        'network_id': fields.String(descreption='Network Id', required=True)
+        'description': fields.String(descreption='Description')
     })
 
-    @ns_organization.doc(body=add_organization_fields)
+    @ns_organization.doc(body=update_organization_fields)
     @jwt_required
     def put(self, id):
         """
@@ -428,9 +427,7 @@ class UpdateOrganization(Resource):
 
         organization = Organization.query.filter_by(id=id).first()
 
-        id = request.json.get('id')
         name = request.json.get("name")
-        network_id = request.json.get('network_id')
 
         temp = Organization.query.filter_by(name=name).first()
 
@@ -448,19 +445,6 @@ class UpdateOrganization(Resource):
         else:
             ret = {'msg': 'Organization not found in database'}
             return make_response(jsonify(ret), 400)
-        
-
-        organization = Organization.query.filter_by(name=name,network_id=network_id).first()
-
-        if not organization:  # If no organization exists with that name, then create a new one
-            organization = Organization(id=id, name=name, network_id=network_id)
-            db.session.add(organization)
-            db.session.commit()
-            ret = {'msg': 'Success'}
-            return make_response(jsonify(ret), 200)
-
-        else:
-            return make_response(jsonify({"msg": "Organization with that name already exists, please try again with a new name."}), 400)
 
 
 @ns_organization.route('/delete/<id>')
@@ -552,6 +536,74 @@ class AddServerGroup(Resource):
 
         else:
             return make_response(jsonify({"msg": "Server Group with that name already exists, please try again with a new name."}), 400)
+
+@ns_server_group.route('/update/<id>')
+class UpdateServerGroup(Resource):
+    update_server_group_fields = api.model('Update Server Group', {
+        'name': fields.String(description='Name', required=True),
+        'organization': fields.String(description='Organization', required=True),
+        'lower_ip_range': fields.String(description='Lower Ip Range', required=True),
+        'upper_ip_range': fields.String(description='Lower Ip Range', required=True),
+        'description': fields.String(description='Description'),
+    })
+
+    @ns_organization.doc(body=update_server_group_fields)
+    @jwt_required
+    def put(self, id):
+        """
+        Update a server group
+        """
+
+        server_group = ServerGroup.query.filter_by(id=id).first()
+
+        name = request.json.get("name")
+        organization = request.json.get("organization")
+        lower_ip_range = request.json.get("lower_ip_range")
+        upper_ip_range = request.json.get("upper_ip_range")
+        description = request.json.get("description")
+
+        temp = ServerGroup.query.filter_by(name=name).first()
+
+        if temp and temp.id != server_group.id: # if server group with that name already exists, return error
+            ret = {'msg': 'Server group name must be unique, please enter a new name.'}
+            return make_response(jsonify(ret), 400)
+
+        description = request.json.get("description")
+
+        if server_group:
+            server_group.name = name
+            server_group.organization = organization
+            server_group.lower_ip_range = lower_ip_range
+            server_group.upper_ip_range = upper_ip_range
+            server_group.description = description
+            db.session.commit()
+            return make_response(jsonify({"msg": "Successfully updated server group!"}), 200)
+        else:
+            ret = {'msg': 'Server group not found in database'}
+            return make_response(jsonify(ret), 400)
+
+@ns_server_group.route('/delete/<id>')
+@ns_server_group.doc(params={'id': ''})
+class DeleteServerGroup(Resource):
+
+    @jwt_required
+    def delete(self, id):
+        """
+        Delete a server group
+        """
+
+        server_group = ServerGroup.query.filter_by(id=id).first()
+
+        if not server_group:  # If no server group exists with that name, then return error
+            ret = {'msg': 'Server group not found in database'}
+            return make_response(jsonify(ret), 400)
+
+        else:
+            db.session.delete(server_group)
+            db.session.commit()
+            ret = {'msg': 'Successfully deleted server group'}
+            return make_response(jsonify(ret), 200)
+    
 
 if __name__ == '__main__':
     app.run()
