@@ -14,3 +14,5 @@ package-lock.json
 Backend/get-pip.py
 Frontend/yarn.lock
 Frontend/src/pages/Network2.vue
+Frontend/public/img/.DS_Store
+Frontend/public/img/.DS_Store

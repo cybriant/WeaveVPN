@@ -5,9 +5,9 @@
        :data-image="backgroundImage">
     <div class="sidebar-wrapper">
       <div class="logo">
-        <a href="#" class="simple-text logo__container">
-            <div class="logo-img">
-                <img src="img/vue-logo.png" alt="">
+        <a href="/admin/overview" class="simple-text logo__container">
+            <div style="padding-right: 10px;">
+                <img src="/img/globe-network.svg" alt="sdn_logo">
             </div>
           {{title}}
         </a>
