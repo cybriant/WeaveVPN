@@ -105,11 +105,7 @@
                               <input v-model="server_group_item.id" hidden />
                             </v-col>
                             <v-col cols="12" sm="12">
-                              <v-text-field
-                                label="Organization"
-                                v-model="server_group_item.organization"
-                                required
-                              ></v-text-field>
+                              <v-select :items="organizations" item-text="name" item-value="name" v-model="server_group_item.organization" label="Organization" required></v-select>
                             </v-col>
                             <v-col cols="12" sm="6">
                               <v-text-field
