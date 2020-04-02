@@ -257,7 +257,7 @@
                                 item-text="name"
                                 item-value="name"
                                 v-model="connection_item.server_group_A"
-                                label="Select Server Group"
+                                label="Server Group A"
                                 required
                               ></v-select>
                             </v-col>
@@ -279,7 +279,7 @@
                                 item-text="name"
                                 item-value="name"
                                 v-model="connection_item.server_group_B"
-                                label="Select Server Group"
+                                label="Server Group B"
                                 required
                               ></v-select>
                             </v-col>
@@ -387,12 +387,12 @@ export default {
     connections: [],
     connection_directions: [
       {
-        text: "Server Group in Domain A to Server Group in Domain B",
-        value: "Server Group in Domain A to Server Group in Domain B"
+        text: "Server Group A to Server Group B",
+        value: "Server Group A to Server Group B"
       },
       {
-        text: "Server Group in Domain B to Server Group in Domain A",
-        value: "Server Group in Domain B to Server Group in Domain A"
+        text: "Server Group B to Server Group A",
+        value: "Server Group B to Server Group A"
       },
       { text: "Bi-directional", value: "Bi-directional" }
     ],
