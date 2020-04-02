@@ -140,7 +140,7 @@
 
                           <v-row style="padding-top: 10px;">
                             <v-col cols="12" sm="12" style="padding-bottom: 0;">
-                              <label style="margin-bottom: 0;">CoIP Subnet:</label>
+                              <label style="margin-bottom: 0;">IP Subnet:</label>
                             </v-col>
 
                             <v-col cols="12" sm="6" style="padding-top: 0;">
