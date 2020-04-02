@@ -4,7 +4,7 @@ from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
     get_jwt_claims, current_user
 )
-from models import db, User, ServerGroup, Organization, Network
+from models import db, User, ServerGroup, Organization, Network, Connection
 from flask_restplus import Api, Resource, fields
 from flask_cors import CORS
 import uuid
@@ -40,6 +40,10 @@ ns_server_group = api.namespace(
 
 ns_organization = api.namespace(
     'organization', description='API calls for organizations'
+)
+
+ns_connection = api.namespace(
+    'connection', description="API calls for connections"
 )
 
 
@@ -199,9 +203,9 @@ class UpdateUser(Resource):
         temp = User.query.filter_by(email=email).first()
 
         if temp and temp.id != user.id:
-            ret = {'msg': 'A user with that email already exists, please use a new email.'}
+            ret = {
+                'msg': 'A user with that email already exists, please use a new email.'}
             return make_response(jsonify(ret), 400)
-
 
         if user:
             user.first_name = first_name
@@ -293,7 +297,7 @@ class AddNetwork(Resource):
         network = Network.query.filter_by(name=name).first()
 
         if not network:  # If no network exists with that name, then create a new one
-            network = Network(id=id,name=name)
+            network = Network(id=id, name=name)
             db.session.add(network)
             db.session.commit()
             ret = {'msg': 'Success'}
@@ -325,7 +329,7 @@ class UpdateNetwork(Resource):
 
         temp = Network.query.filter_by(name=name).first()
 
-        if temp and temp.id != network.id: # if network with that name already exists, return error
+        if temp and temp.id != network.id:  # if network with that name already exists, return error
             ret = {'msg': 'Network name must be unique, please enter a new name.'}
             return make_response(jsonify(ret), 400)
 
@@ -399,10 +403,12 @@ class AddOrganization(Resource):
         name = request.json.get("name")
         network_id = request.json.get('network_id')
 
-        organization = Organization.query.filter_by(name=name,network_id=network_id).first()
+        organization = Organization.query.filter_by(
+            name=name, network_id=network_id).first()
 
         if not organization:  # If no organization exists with that name, then create a new one
-            organization = Organization(id=id, name=name, network_id=network_id)
+            organization = Organization(
+                id=id, name=name, network_id=network_id)
             db.session.add(organization)
             db.session.commit()
             ret = {'msg': 'Success'}
@@ -410,6 +416,7 @@ class AddOrganization(Resource):
 
         else:
             return make_response(jsonify({"msg": "Organization with that name already exists, please try again with a new name."}), 400)
+
 
 @ns_organization.route('/update/<id>')
 class UpdateOrganization(Resource):
@@ -431,7 +438,7 @@ class UpdateOrganization(Resource):
 
         temp = Organization.query.filter_by(name=name).first()
 
-        if temp and temp.id != organization.id: # if organization with that name already exists, return error
+        if temp and temp.id != organization.id:  # if organization with that name already exists, return error
             ret = {'msg': 'Organization name must be unique, please enter a new name.'}
             return make_response(jsonify(ret), 400)
 
@@ -469,10 +476,28 @@ class DeleteOrganization(Resource):
             ret = {'msg': 'Successfully deleted organization'}
             return make_response(jsonify(ret), 200)
 
+@ns_server_group.route('/all/<network_id>/<org_id>')
+@ns_server_group.doc(params={'network_id': '', 'org_id': ''})
+class GetServerGroupsByOrganization(Resource):
+
+    @jwt_required
+    def get(self, network_id, org_id):
+        """
+        Returns a list of all server groups within an organization
+        """
+
+        # get all server groups from db
+        server_groups = ServerGroup.query.filter_by(network_id=network_id, organization_id=org_id)
+
+        size = server_groups.count()
+
+        # returns list of server groups as json response
+        return make_response(jsonify(size=size, server_groups=[server_group.serialize() for server_group in server_groups]))
+
 
 @ns_server_group.route('/all/<network_id>')
 @ns_server_group.doc(params={'network_id': ''})
-class GetServerGroups(Resource):
+class GetServerGroupsByNetwork(Resource):
 
     @jwt_required
     def get(self, network_id):
@@ -495,7 +520,6 @@ class AddServerGroup(Resource):
     add_server_group_fields = api.model('Add Server Group', {
         'name': fields.String(description='Name', required=True),
         'organization': fields.String(description='Organization', required=True),
-        'category': fields.String(description='Category', required=True),
         'lower_ip_range': fields.String(description='Lower IP Range', required=True),
         'upper_ip_range': fields.String(description='Upper IP Range', required=True),
         'description': fields.String(description='Description', required=True),
@@ -526,7 +550,7 @@ class AddServerGroup(Resource):
             return make_response(jsonify({"msg": "Invalid organization name. Please use an active organization."}), 400)
 
         if not server_group:  # If no server group exists with that name, then create a new one
-            server_group = ServerGroup(id=id, name=name, organization=organization,
+            server_group = ServerGroup(id=id, name=name, organization=organization, organization_id=temp.id,
                                        lower_ip_range=lower_ip_range, upper_ip_range=upper_ip_range,
                                        description=description, network_id=network_id)
             db.session.add(server_group)
@@ -536,6 +560,7 @@ class AddServerGroup(Resource):
 
         else:
             return make_response(jsonify({"msg": "Server Group with that name already exists, please try again with a new name."}), 400)
+
 
 @ns_server_group.route('/update/<id>')
 class UpdateServerGroup(Resource):
@@ -564,7 +589,7 @@ class UpdateServerGroup(Resource):
 
         temp = ServerGroup.query.filter_by(name=name).first()
 
-        if temp and temp.id != server_group.id: # if server group with that name already exists, return error
+        if temp and temp.id != server_group.id:  # if server group with that name already exists, return error
             ret = {'msg': 'Server group name must be unique, please enter a new name.'}
             return make_response(jsonify(ret), 400)
 
@@ -581,6 +606,7 @@ class UpdateServerGroup(Resource):
         else:
             ret = {'msg': 'Server group not found in database'}
             return make_response(jsonify(ret), 400)
+
 
 @ns_server_group.route('/delete/<id>')
 @ns_server_group.doc(params={'id': ''})
@@ -603,7 +629,139 @@ class DeleteServerGroup(Resource):
             db.session.commit()
             ret = {'msg': 'Successfully deleted server group'}
             return make_response(jsonify(ret), 200)
-    
+
+
+@ns_connection.route('/all/<network_id>')
+@ns_connection.doc(params={'network_id': ''})
+class GetConnections(Resource):
+
+    @jwt_required
+    def get(self, network_id):
+        """
+        Returns a list of all network connections within a network
+        """
+
+        # get all network connections from db
+        connections = Connection.query.filter_by(network_id=network_id)
+
+        size = connections.count()
+
+        if not connections:  # If no connections exists, then return error
+            ret = {'msg': 'No connections found in database'}
+            return make_response(jsonify(ret), 400)
+
+        else:
+            # returns list of network connections as json response
+            return make_response(jsonify(size=size, connections=[connection.serialize() for connection in connections]), 200)
+
+
+@ns_connection.route('/create')
+class AddConnection(Resource):
+
+    add_connection_fields = api.model('Add Connection', {
+        'direction': fields.String(description='Description', required=True),
+        'organization_A': fields.String(description='Organization A', required=True),
+        'organization_B': fields.String(description='Organization B', required=True),
+        'server_group_A': fields.String(description='Server Group A', required=True),
+        'server_group_B': fields.String(description='Server Group B', required=True),
+        'network_id': fields.String(description='Network Id', required=True)
+    })
+
+    @ns_server_group.doc(body=add_connection_fields)
+    @jwt_required
+    def post(self):
+        """
+        Create a new network connection
+        """
+
+        id = request.json.get("id")
+        direction = request.json.get("direction")
+        organization_A = request.json.get("organization_A")
+        organization_B = request.json.get("organization_B")
+        server_group_A = request.json.get('server_group_A')
+        server_group_B = request.json.get('server_group_B')
+        network_id = request.json.get('network_id')
+
+        connection = Connection.query.filter_by(direction=direction, organization_A=organization_A, organization_B=organization_B,
+                                                server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id).first()
+
+        if not connection:  # If that connection doesn't already exists, then we can create a new one
+            connection = Connection(id=id, direction=direction, organization_A=organization_A, organization_B=organization_B,
+                                       server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id)
+            db.session.add(connection)
+            db.session.commit()
+            ret = {'msg': 'Success'}
+            return make_response(jsonify(ret), 200)
+
+        else:
+            return make_response(jsonify({"msg": "Unable to add connection. That connection already exists"}), 400)
+
+@ns_connection.route('/update/<id>')
+class UpdateConnection(Resource):
+    update_connection_fields = api.model('Update Connection', {
+        'name': fields.String(description='Name', required=True),
+        'organization': fields.String(description='Organization', required=True),
+        'lower_ip_range': fields.String(description='Lower Ip Range', required=True),
+        'upper_ip_range': fields.String(description='Lower Ip Range', required=True),
+        'description': fields.String(description='Description'),
+    })
+
+    @ns_connection.doc(body=update_connection_fields)
+    @jwt_required
+    def put(self, id):
+        """
+        Update a network connection
+        """
+
+        connection = Connection.query.filter_by(id=id).first()
+
+        direction = request.json.get("direction")
+        organization_A = request.json.get("organization_A")
+        organization_B = request.json.get("organization_B")
+        server_group_A = request.json.get('server_group_A')
+        server_group_B = request.json.get('server_group_B')
+        network_id = request.json.get('network_id')
+
+        temp = Connection.query.filter_by(direction=direction, organization_A=organization_A, organization_B=organization_B,
+                                                server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id).first()
+
+
+        if not temp:  # If a connection with these parameters does not already exists, then we can update the connection to the specific parameters
+
+            connection.direction = direction
+            connection.organization_A = organization_A
+            connection.organization_B = organization_B
+            connection.server_group_A = server_group_A
+            connection.server_group_B = server_group_B
+
+            db.session.commit()
+            return make_response(jsonify({"msg": "Successfully updated network connection!"}), 200)
+
+        else:
+            return make_response(jsonify({"msg": "Unable to add connection. That connection already exists"}), 400)
+
+@ns_connection.route('/delete/<id>')
+@ns_connection.doc(params={'id': ''})
+class DeleteConnection(Resource):
+
+    @jwt_required
+    def delete(self, id):
+        """
+        Delete a network connection
+        """
+
+        connection = Connection.query.filter_by(id=id).first()
+
+        if not connection:  # If no connection exists with that id, then return error
+            ret = {'msg': 'Network connection not found in database'}
+            return make_response(jsonify(ret), 400)
+
+        else:
+            db.session.delete(connection)
+            db.session.commit()
+            ret = {'msg': 'Successfully deleted network connection'}
+            return make_response(jsonify(ret), 200)
+
 
 if __name__ == '__main__':
     app.run()

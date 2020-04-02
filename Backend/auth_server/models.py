@@ -89,6 +89,7 @@ class ServerGroup(db.Model):
     upper_ip_range = db.Column(db.String(30))
     description = db.Column(db.String(150))
     network_id = db.Column(db.String(100))
+    organization_id = db.Column(db.String(100))
 
     def get_id(self):
         return self.id
@@ -98,6 +99,9 @@ class ServerGroup(db.Model):
 
     def get_organization(self):
         return self.organization
+
+    def get_organization_id(self):
+        return self.organization_id
 
     def get_category(self):
         return self.category
@@ -119,10 +123,51 @@ class ServerGroup(db.Model):
             'id': self.id,
             'name': self.name,
             'organization': self.organization,
-            'category': self.category,
+            'organization_id': self.organization_id,
             'lower_ip_range': self.lower_ip_range,
             'upper_ip_range': self.upper_ip_range,
             'description': self.description,
+            'network_id': self.network_id,
+        }
+
+class Connection(db.Model):
+    id = db.Column(db.String(100), primary_key=True)
+    direction = db.Column(db.String(150))
+    organization_A = db.Column(db.String(100))
+    organization_B = db.Column(db.String(100))
+    server_group_A = db.Column(db.String(100))
+    server_group_B = db.Column(db.String(100))
+    network_id = db.Column(db.String(100))
+
+    def get_id(self):
+        return self.id
+
+    def get_direction(self):
+        return self.direction
+
+    def get_organization_A(self):
+        return self.organization_A
+
+    def get_organization_B(self):
+        return self.organization_B
+
+    def get_server_group_A(self):
+        return self.server_group_A
+
+    def get_server_group_B(self):
+        return self.server_group_B
+
+    def get_network_id(self):
+        return self.network_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'direction': self.direction,
+            'organization_A': self.organization_A,
+            'organization_B': self.organization_B,
+            'server_group_A': self.server_group_A,
+            'server_group_B': self.server_group_B,
             'network_id': self.network_id,
         }
 
