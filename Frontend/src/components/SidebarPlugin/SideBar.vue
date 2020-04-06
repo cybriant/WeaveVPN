@@ -43,7 +43,7 @@
     props: {
       title: {
         type: String,
-        default: 'SDN'
+        default: 'WeaveVPN'
       },
       backgroundColor: {
         type: String,
