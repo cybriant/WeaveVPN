@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request, make_response
+from flask import Flask, jsonify, request, make_response, send_file
 from werkzeug.security import gen_salt, generate_password_hash
 from flask_jwt_extended import (
     JWTManager, jwt_required, create_access_token,
@@ -10,6 +10,8 @@ from flask_cors import CORS
 import uuid
 # from abc import ABC, abstractmethod
 import datetime
+
+from zipfile import ZipFile
 
 
 app = Flask(__name__)
@@ -63,6 +65,32 @@ def add_claims_to_access_token(identity):
         'first_name': user.get_first_name(),
         'last_name': user.get_last_name(),
     }
+
+# End point to download zip file
+@api.route('/download')
+class DownLoad(Resource):
+
+    def download_file(self):
+
+        # Add name of the zip file to go here
+        path = "configuration.zip"
+
+        return send_file(path, as_attachment=True)
+
+
+@api.route('/create_zip')
+class CreateZip(Resource):
+    def get(self):
+        # create a ZipFile object
+        zipObj = ZipFile('configuration.zip', 'w')
+
+        # Add multiple files to the zip
+        zipObj.write('open-vpn-command.py')
+
+        # close the Zip File
+        zipObj.close()
+
+        return make_response(jsonify({"msg": "Successfully Created Zip"}), 200)
 
 
 @api.route('/register')
@@ -476,6 +504,7 @@ class DeleteOrganization(Resource):
             ret = {'msg': 'Successfully deleted organization'}
             return make_response(jsonify(ret), 200)
 
+
 @ns_server_group.route('/all/<network_id>/<org_id>')
 @ns_server_group.doc(params={'network_id': '', 'org_id': ''})
 class GetServerGroupsByOrganization(Resource):
@@ -487,7 +516,8 @@ class GetServerGroupsByOrganization(Resource):
         """
 
         # get all server groups from db
-        server_groups = ServerGroup.query.filter_by(network_id=network_id, organization_id=org_id)
+        server_groups = ServerGroup.query.filter_by(
+            network_id=network_id, organization_id=org_id)
 
         size = server_groups.count()
 
@@ -687,7 +717,7 @@ class AddConnection(Resource):
 
         if not connection:  # If that connection doesn't already exists, then we can create a new one
             connection = Connection(id=id, direction=direction, organization_A=organization_A, organization_B=organization_B,
-                                       server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id)
+                                    server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id)
             db.session.add(connection)
             db.session.commit()
             ret = {'msg': 'Success'}
@@ -695,6 +725,7 @@ class AddConnection(Resource):
 
         else:
             return make_response(jsonify({"msg": "Unable to add connection. That connection already exists"}), 400)
+
 
 @ns_connection.route('/update/<id>')
 class UpdateConnection(Resource):
@@ -723,8 +754,7 @@ class UpdateConnection(Resource):
         network_id = request.json.get('network_id')
 
         temp = Connection.query.filter_by(direction=direction, organization_A=organization_A, organization_B=organization_B,
-                                                server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id).first()
-
+                                          server_group_A=server_group_A, server_group_B=server_group_B, network_id=network_id).first()
 
         if not temp:  # If a connection with these parameters does not already exists, then we can update the connection to the specific parameters
 
@@ -739,6 +769,7 @@ class UpdateConnection(Resource):
 
         else:
             return make_response(jsonify({"msg": "Unable to add connection. That connection already exists"}), 400)
+
 
 @ns_connection.route('/delete/<id>')
 @ns_connection.doc(params={'id': ''})
