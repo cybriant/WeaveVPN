@@ -68,9 +68,9 @@ def add_claims_to_access_token(identity):
 
 # End point to download zip file
 @api.route('/download')
-class DownLoad(Resource):
+class Download(Resource):
 
-    def download_file(self):
+    def get(self):
 
         # Add name of the zip file to go here
         path = "configuration.zip"
