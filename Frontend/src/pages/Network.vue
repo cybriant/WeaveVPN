@@ -10,7 +10,6 @@
               <v-tab>Organizations</v-tab>
               <v-tab>Server Groups</v-tab>
               <v-tab>Connection Rules</v-tab>
-              <v-tab>Firewall Rules</v-tab>
 
               <!-- ORGANIZATIONS TAB -->
 
@@ -332,12 +331,6 @@
               </v-tab-item>
 
               <!-- END OF CONNECTIONS TAB -->
-
-              <!-- FIREWALL RULES TAB -->
-
-              <v-tab-item style="margin-top: 1rem;">
-                <p>firewall rules stuff goes here</p>
-              </v-tab-item>
             </v-tabs>
           </card>
         </div>
