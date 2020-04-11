@@ -8,7 +8,6 @@ from models import db, User, ServerGroup, Organization, Network, Connection
 from flask_restplus import Api, Resource, fields
 from flask_cors import CORS
 import uuid
-# from abc import ABC, abstractmethod
 import datetime
 
 from zipfile import ZipFile
@@ -47,6 +46,29 @@ ns_organization = api.namespace(
 ns_connection = api.namespace(
     'connection', description="API calls for connections"
 )
+
+class UserObject:
+    def __init__(self, email, role):
+        self.email = email
+        self.role = role
+
+# This function is called whenever a protected endpoint is accessed,
+# and must return an object based on the tokens identity.
+# This is called after the token is verified. This needs to
+# return None if the user could not be loaded for any reason,
+# such as not being found in the database
+@jwt.user_loader_callback_loader
+def user_loader_callback(identity):
+
+    user = User.query.filter_by(email=identity).first()
+
+    if not user:
+        return None
+
+    return UserObject(
+        email=identity,
+        role=user.get_user_role()
+    )
 
 
 @app.before_first_request
@@ -117,12 +139,12 @@ class Register(Resource):
 
         user = User.query.filter_by(email=email).first()
 
-        # ANYONE WHO REGISTERS A NEW ACCOUNT WILL BE ASSIGNED AN ADMIN ROLE FOR NOW, THIS WILL NEED TO BE CHANGED IN THE FUTURE
+        # ANYONE WHO REGISTERS A NEW ACCOUNT WILL BE ASSIGNED A USER ROLE
         if not user:  # If no user exists with that email, then create account
             password_hashed = generate_password_hash(
                 password=password, method="pbkdf2:sha256", salt_length=20)
             user = User(id=id, first_name=first_name, last_name=last_name,
-                        email=email, password=password_hashed, role='Administrator')
+                        email=email, password=password_hashed, role='User')
             db.session.add(user)
             db.session.commit()
             ret = {'access_token': create_access_token(email)}
@@ -180,6 +202,9 @@ class AddUser(Resource):
         Create a new user
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         id = request.json.get("id")
         first_name = request.json.get("first_name")
         last_name = request.json.get("last_name")
@@ -221,6 +246,9 @@ class UpdateUser(Resource):
         Update a user
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         user = User.query.filter_by(id=id).first()
 
         first_name = request.json.get("first_name")
@@ -257,6 +285,9 @@ class DeleteUser(Resource):
         """
         Delete a user
         """
+
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
 
         user = User.query.filter_by(id=id).first()
 
@@ -319,6 +350,9 @@ class AddNetwork(Resource):
         Create a new network
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         id = request.json.get("id")
         name = request.json.get("name")
 
@@ -351,6 +385,9 @@ class UpdateNetwork(Resource):
         Update a network
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         network = Network.query.filter_by(id=id).first()
 
         name = request.json.get("name")
@@ -382,6 +419,9 @@ class DeleteNetwork(Resource):
         """
         Delete a network
         """
+
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
 
         network = Network.query.filter_by(id=id).first()
 
@@ -427,6 +467,9 @@ class AddOrganization(Resource):
         Create a new Organization
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         id = request.json.get('id')
         name = request.json.get("name")
         network_id = request.json.get('network_id')
@@ -460,6 +503,9 @@ class UpdateOrganization(Resource):
         Update an Organization
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         organization = Organization.query.filter_by(id=id).first()
 
         name = request.json.get("name")
@@ -491,6 +537,9 @@ class DeleteOrganization(Resource):
         """
         Delete an organization
         """
+
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
 
         organization = Organization.query.filter_by(id=id).first()
 
@@ -563,6 +612,9 @@ class AddServerGroup(Resource):
         Create a new server group
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         id = request.json.get("id")
         name = request.json.get("name")
         organization = request.json.get("organization")
@@ -609,6 +661,9 @@ class UpdateServerGroup(Resource):
         Update a server group
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         server_group = ServerGroup.query.filter_by(id=id).first()
 
         name = request.json.get("name")
@@ -647,6 +702,9 @@ class DeleteServerGroup(Resource):
         """
         Delete a server group
         """
+
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
 
         server_group = ServerGroup.query.filter_by(id=id).first()
 
@@ -704,6 +762,9 @@ class AddConnection(Resource):
         Create a new network connection
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         id = request.json.get("id")
         direction = request.json.get("direction")
         organization_A = request.json.get("organization_A")
@@ -744,6 +805,9 @@ class UpdateConnection(Resource):
         Update a network connection
         """
 
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
+
         connection = Connection.query.filter_by(id=id).first()
 
         direction = request.json.get("direction")
@@ -780,6 +844,9 @@ class DeleteConnection(Resource):
         """
         Delete a network connection
         """
+
+        if "Administrator" != current_user.role:
+            return make_response(jsonify({"msg": "Forbidden" }), 403)
 
         connection = Connection.query.filter_by(id=id).first()
 
