@@ -6,7 +6,7 @@
           
 
             <v-data-table
-              :headers="headers"
+              :headers="computedHeaders"
               :items="networks"
               :search="search"
               sort-by="Name"
@@ -15,12 +15,13 @@
 
               <template v-slot:top>
                 <v-toolbar flat color="white" style="border-radius: 100px;">
-                  <h4>Network Management</h4>
+                  <h4 v-if="role === 'Administrator'" >Network Management</h4>
+                  <h4 v-if="role === 'User'" >Software Defined Networks</h4>
                 </v-toolbar>
       
                 <v-toolbar flat color="white">
                   <!-- Start of dialog -->
-                  <v-dialog v-model="dialog" max-width="500px">
+                  <v-dialog v-if="role === 'Administrator'" v-model="dialog" max-width="500px">
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Network
@@ -72,7 +73,7 @@
                 <router-link :to="'/admin/network?name='+ item.name + '&id=' + item.id">{{ item.name }}</router-link>
               </template>
 
-              <template v-slot:item.action="{ item }">
+              <template v-if="role === 'Administrator'" v-slot:item.action="{ item }">
                 <v-icon class="mr-2" @click="editItem(item)" title="Edit Network">edit</v-icon>
                 <v-icon @click="deleteItem(item)" title="Delete Network">delete</v-icon>
               </template>
@@ -87,6 +88,7 @@
 import { v4 as uuidv4 } from 'uuid';
 export default {
   data: () => ({
+    role: "",
     search: "",
     dialog: false,
     headers: [
@@ -106,6 +108,15 @@ export default {
     },
     submitBtn() {
       return this.editedIndex === -1 ? "Add" : "Update";
+    },
+    computedHeaders() {
+      // hide action buttons for users
+      if(this.$store.getters.role === "User") {
+        return this.headers.filter(header => header.text !== "Actions")
+      }
+      else {
+        return this.headers;
+      }
     }
   },
 
@@ -121,6 +132,9 @@ export default {
 
   methods: {
     initialize() {
+
+      this.role = this.$store.getters.role;
+
       this.$http
         .get("http://127.0.0.1:5000/network/all")
         .then(({ data }) => {

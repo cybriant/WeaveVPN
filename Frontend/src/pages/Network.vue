@@ -15,7 +15,7 @@
 
               <v-tab-item style="margin-top: 1rem;">
                 <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
-                  <v-dialog v-model="organizations_dialog" persistent max-width="600px">
+                  <v-dialog v-if="role === 'Administrator'" v-model="organizations_dialog" persistent max-width="600px">
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Organization
@@ -71,13 +71,13 @@
                 </v-row>
 
                 <v-data-table
-                  :headers="organizations_headers"
+                  :headers="computedOrgHeaders"
                   :items="organizations"
                   :search="organizations_search"
                   sort-by="Name"
                   class="elevation-1"
                 >
-                  <template v-slot:item.action="{ item }">
+                  <template v-if="role === 'Administrator'" v-slot:item.action="{ item }">
                     <v-icon class="mr-2" @click="editOrgItem(item)" title="Edit Network">edit</v-icon>
                     <v-icon @click="deleteOrgItem(item)" title="Delete Network">delete</v-icon>
                   </template>
@@ -92,7 +92,7 @@
                 <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
                   <!-- SERVER GROUP MODAL -->
 
-                  <v-dialog v-model="server_groups_dialog" persistent max-width="600px">
+                  <v-dialog v-if="role === 'Administrator'" v-model="server_groups_dialog" persistent max-width="600px">
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Server Group
@@ -189,13 +189,13 @@
                 </v-row>
 
                 <v-data-table
-                  :headers="server_group_headers"
+                  :headers="computedServerGroupHeaders"
                   :items="server_groups"
                   :search="server_group_search"
                   sort-by="Name"
                   class="elevation-1"
                 >
-                  <template v-slot:item.action="{ item }">
+                  <template v-if="role === 'Administrator'" v-slot:item.action="{ item }">
                     <v-icon
                       class="mr-2"
                       @click="editServerGroupItem(item)"
@@ -214,7 +214,7 @@
                 <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
                   <!-- CONNECTIONS MODAL -->
 
-                  <v-dialog v-model="connections_dialog" persistent max-width="600px">
+                  <v-dialog v-if="role === 'Administrator'" v-model="connections_dialog" persistent max-width="600px">
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Connection Rule
@@ -313,13 +313,13 @@
                 </v-row>
 
                 <v-data-table
-                  :headers="connections_headers"
+                  :headers="computedConnectionHeaders"
                   :items="connections"
                   :search="connections_search"
                   sort-by="Organization A"
                   class="elevation-1"
                 >
-                  <template v-slot:item.action="{ item }">
+                  <template v-if="role === 'Administrator'" v-slot:item.action="{ item }">
                     <v-icon
                       class="mr-2"
                       @click="editConnectionItem(item)"
@@ -343,6 +343,8 @@ import { v4 as uuidv4 } from "uuid";
 export default {
   components: {},
   data: () => ({
+    role: "",
+
     // Organization data
     editedOrgIndex: -1,
     defaultOrgItem: {},
@@ -406,10 +408,40 @@ export default {
     this.getServerGroups();
     this.getOrganizations();
     this.getConnections();
+    this.role = this.$store.getters.role;
   },
   computed: {
     network_name() {
       return this.$route.query.name;
+    },
+    computedOrgHeaders() {
+      // hide action buttons for users
+      if(this.$store.getters.role === "User") {
+        return this.organizations_headers.filter(header => header.text !== "Actions")
+      }
+      else {
+        return this.organizations_headers;
+      }
+    },
+
+    computedServerGroupHeaders() {
+      // hide action buttons for users
+      if(this.$store.getters.role === "User") {
+        return this.server_group_headers.filter(header => header.text !== "Actions")
+      }
+      else {
+        return this.server_group_headers;
+      }
+    },
+
+    computedConnectionHeaders() {
+      // hide action buttons for users
+      if(this.$store.getters.role === "User") {
+        return this.connections_headers.filter(header => header.text !== "Actions")
+      }
+      else {
+        return this.connections_headers;
+      }
     },
 
     // Organization methods
