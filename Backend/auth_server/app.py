@@ -86,6 +86,7 @@ def add_claims_to_access_token(identity):
         'role': user.get_user_role(),
         'first_name': user.get_first_name(),
         'last_name': user.get_last_name(),
+        'id': user.get_user_id(),
     }
 
 # End point to download zip file
@@ -268,6 +269,45 @@ class UpdateUser(Resource):
             user.last_name = last_name
             user.email = email
             user.role = role
+            db.session.commit()
+            return make_response(jsonify({"msg": "Successfully updated user!"}), 200)
+        else:
+            ret = {'msg': 'User not found in database'}
+            return make_response(jsonify(ret), 400)
+
+@api.route('/update-profile/<id>')
+class UpdateProfile(Resource):
+
+    update_profile_fields = api.model('Update Profile', {
+        'first_name': fields.String(description='First Name', required=True),
+        'last_name': fields.String(description='Last Name', required=True),
+        'email': fields.String(description='Email', required=True),
+    })
+
+    @api.doc(body=update_profile_fields)
+    @jwt_required
+    def put(self, id):
+        """
+        Update a user profile
+        """
+
+        user = User.query.filter_by(id=id).first()
+
+        first_name = request.json.get("first_name")
+        last_name = request.json.get("last_name")
+        email = request.json.get('email')
+
+        temp = User.query.filter_by(email=email).first()
+
+        if temp and temp.id != user.id:
+            ret = {
+                'msg': 'A user with that email already exists, please use a new email.'}
+            return make_response(jsonify(ret), 400)
+
+        if user:
+            user.first_name = first_name
+            user.last_name = last_name
+            user.email = email
             db.session.commit()
             return make_response(jsonify({"msg": "Successfully updated user!"}), 200)
         else:

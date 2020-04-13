@@ -62,7 +62,8 @@ export default new Vuex.Store({
   getters: {
     isLoggedIn: state => !!state.token, // if user state is null it returns false, otherwise it returns true
     authStatus: state => state.status,
-    role: state => state.user.role
+    role: state => state.user.role,
+    first_name: state => state.user.first_name
   },
   modules: {
 
