@@ -10,12 +10,18 @@
               <v-tab>Organizations</v-tab>
               <v-tab>Server Groups</v-tab>
               <v-tab>Connection Rules</v-tab>
+              <v-tab>Downloads</v-tab>
 
               <!-- ORGANIZATIONS TAB -->
 
               <v-tab-item style="margin-top: 1rem;">
                 <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
-                  <v-dialog v-if="role === 'Administrator'" v-model="organizations_dialog" persistent max-width="600px">
+                  <v-dialog
+                    v-if="role === 'Administrator'"
+                    v-model="organizations_dialog"
+                    persistent
+                    max-width="600px"
+                  >
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Organization
@@ -92,7 +98,12 @@
                 <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
                   <!-- SERVER GROUP MODAL -->
 
-                  <v-dialog v-if="role === 'Administrator'" v-model="server_groups_dialog" persistent max-width="600px">
+                  <v-dialog
+                    v-if="role === 'Administrator'"
+                    v-model="server_groups_dialog"
+                    persistent
+                    max-width="600px"
+                  >
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Server Group
@@ -214,7 +225,12 @@
                 <v-row no-gutters style="padding-top: 10px; padding-bottom: 20px;">
                   <!-- CONNECTIONS MODAL -->
 
-                  <v-dialog v-if="role === 'Administrator'" v-model="connections_dialog" persistent max-width="600px">
+                  <v-dialog
+                    v-if="role === 'Administrator'"
+                    v-model="connections_dialog"
+                    persistent
+                    max-width="600px"
+                  >
                     <template v-slot:activator="{ on }">
                       <v-btn color="primary" dark class="mb-2" v-on="on">
                         <v-icon>mdi-plus</v-icon>Create Connection Rule
@@ -331,6 +347,18 @@
               </v-tab-item>
 
               <!-- END OF CONNECTIONS TAB -->
+
+              <!-- DOWNLOADS TAB -->
+
+              <v-tab-item style="margin-top: 1rem;">
+
+                <div class="my-2">
+                  <v-btn @click="downloadPackage()" color="success" dark>Download Package<i class="fas fa-download" style="margin-left: 5px;"></i></v-btn>
+                </div>
+
+              </v-tab-item>
+
+              <!-- END OF DOWNLOADS TAB -->
             </v-tabs>
           </card>
         </div>
@@ -416,30 +444,33 @@ export default {
     },
     computedOrgHeaders() {
       // hide action buttons for users
-      if(this.$store.getters.role === "User") {
-        return this.organizations_headers.filter(header => header.text !== "Actions")
-      }
-      else {
+      if (this.$store.getters.role === "User") {
+        return this.organizations_headers.filter(
+          header => header.text !== "Actions"
+        );
+      } else {
         return this.organizations_headers;
       }
     },
 
     computedServerGroupHeaders() {
       // hide action buttons for users
-      if(this.$store.getters.role === "User") {
-        return this.server_group_headers.filter(header => header.text !== "Actions")
-      }
-      else {
+      if (this.$store.getters.role === "User") {
+        return this.server_group_headers.filter(
+          header => header.text !== "Actions"
+        );
+      } else {
         return this.server_group_headers;
       }
     },
 
     computedConnectionHeaders() {
       // hide action buttons for users
-      if(this.$store.getters.role === "User") {
-        return this.connections_headers.filter(header => header.text !== "Actions")
-      }
-      else {
+      if (this.$store.getters.role === "User") {
+        return this.connections_headers.filter(
+          header => header.text !== "Actions"
+        );
+      } else {
         return this.connections_headers;
       }
     },
@@ -894,6 +925,34 @@ export default {
         .then(({ data }) => {
           // Adds the connections from the database to the table
           this.server_groups_from_org_B = data.server_groups;
+        })
+        .catch(err => {
+          console.log(err.response.data);
+          this.$notify({
+            group: "foo",
+            title: "Error",
+            text: err.response.data,
+            type: "error"
+          });
+        });
+    },
+
+    // download package
+    downloadPackage() {
+      this.$http
+        .get(
+          "http://127.0.0.1:5000/download",
+          { responseType: "blob" }
+        )
+        .then((response) => {
+          var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+          var fileLink = document.createElement('a');
+
+          fileLink.href = fileURL;
+          fileLink.setAttribute('download', 'configuration.zip');
+          document.body.appendChild(fileLink);
+
+          fileLink.click();
         })
         .catch(err => {
           console.log(err.response.data);
