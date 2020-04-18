@@ -1,4 +1,4 @@
-# KSU_SDN
+# WeaveVPN
 
 # Technology Stack
 - Vue.js
