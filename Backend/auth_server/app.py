@@ -140,19 +140,31 @@ class Register(Resource):
 
         user = User.query.filter_by(email=email).first()
 
-        # ANYONE WHO REGISTERS A NEW ACCOUNT WILL BE ASSIGNED A USER ROLE
-        if not user:  # If no user exists with that email, then create account
+        users = User.query.all()
+        size = len(users)
+
+        # if this is the first user in the database, then make them an admin
+        if (size == 0):
             password_hashed = generate_password_hash(
                 password=password, method="pbkdf2:sha256", salt_length=20)
             user = User(id=id, first_name=first_name, last_name=last_name,
-                        email=email, password=password_hashed, role='User')
+                        email=email, password=password_hashed, role='Administrator')
             db.session.add(user)
             db.session.commit()
             ret = {'access_token': create_access_token(email)}
             return make_response(jsonify(ret), 200)
-
         else:
-            return make_response(jsonify({"msg": "Account with that email already exists, please try again with a new email."}), 401)
+            if not user:  # If no user exists with that email, then create account
+                password_hashed = generate_password_hash(
+                password=password, method="pbkdf2:sha256", salt_length=20)
+                user = User(id=id, first_name=first_name, last_name=last_name,
+                        email=email, password=password_hashed, role='User')
+                db.session.add(user)
+                db.session.commit()
+                ret = {'access_token': create_access_token(email)}
+                return make_response(jsonify(ret), 200)
+            else:
+                return make_response(jsonify({"msg": "Account with that email already exists, please try again with a new email."}), 401)
 
 
 @api.route('/login')
