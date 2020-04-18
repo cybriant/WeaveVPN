@@ -8,12 +8,6 @@
 
             <h4 style="margin-top: 0;">Settings</h4>
             
-            <div class="footer">
-              <hr>
-              <div class="stats">
-                <i class="fa fa-history"></i> Updated 3 minutes ago
-              </div>
-            </div>
           </card>
 
         </div>

@@ -8,7 +8,7 @@
           <card>
             <div class="row" style="text-align: center;">
               <!-- Grid column -->
-              <div class="col-md-4">
+              <div class="col-md-4" v-if="role === 'Administrator'">
                 <i class="fas fa-network-wired fa-3x" style="color: #FF4A55;"></i>
                 <h5 class="font-weight-bold my-4">Network Management</h5>
                 <p class="grey-text">Setup and configure Software Defined Networks</p>
@@ -20,10 +20,23 @@
                   </router-link>
                 </div>
               </div>
+
+              <div class="col-md-6" v-if="role === 'User'">
+                <i class="fas fa-network-wired fa-3x" style="color: #FF4A55;"></i>
+                <h5 class="font-weight-bold my-4">Network Management</h5>
+                <p class="grey-text">View Software Defined Networks</p>
+                <div class="text-center">
+                  <router-link :to="'/admin/network-management'" style="color: white;">
+                    <v-btn rounded color="primary" dark>
+                      View Networks
+                    </v-btn>
+                  </router-link>
+                </div>
+              </div>
               <!-- Grid column -->
 
               <!-- Grid column -->
-              <div class="col-md-4">
+              <div class="col-md-4" v-if="role === 'Administrator'">
                 <i class="fas fa-users fa-3x" style="color: #87CB16"></i>
                 <h5 class="font-weight-bold my-4">User Management</h5>
                 <p class="grey-text">Create, update, or delete users</p>
@@ -50,6 +63,7 @@
                   </a>
                 </div>
               </div>
+
             </div>
           </card>
         </div>
@@ -70,6 +84,7 @@ export default {
   },
   data() {
     return {
+      role: "",
       user_list_size: "",
       network_list_size: "",
       info: null,
@@ -77,8 +92,8 @@ export default {
       deleteTooltip: "Remove",
     };
   },
-  mounted() {
-    
+  created() {
+    this.role = this.$store.getters.role;
   },
 
   computed: {
