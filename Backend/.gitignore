@@ -1,5 +1,3 @@
 *.sqlite
 *.pyc
 *.db
-configuration.zip
-auth_server/configuration.zip
