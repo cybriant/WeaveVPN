@@ -156,7 +156,7 @@
                             <v-col cols="12" sm="6" style="padding-top: 0;">
                               <v-text-field
                                 label="Lower IP Range"
-                                hint="ex 172.24.0.1"
+                                hint="ex 192.168.0.1"
                                 v-model="server_group_item.lower_ip_range"
                                 required
                               ></v-text-field>
@@ -164,7 +164,7 @@
                             <v-col cols="12" sm="6" style="padding-top: 0;">
                               <v-text-field
                                 label="Upper IP Range"
-                                hint="ex 172.24.0.254"
+                                hint="ex 192.168.0.8"
                                 v-model="server_group_item.upper_ip_range"
                                 required
                               ></v-text-field>
