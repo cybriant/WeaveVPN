@@ -600,6 +600,12 @@ class DeleteOrganization(Resource):
 
         organization = Organization.query.filter_by(id=id).first()
 
+        network_id = organization.get_network_id()
+
+        ServerGroup.query.filter_by(organization_id=id).delete()
+        Connection.query.filter_by(network_id=network_id,organization_A=organization.get_name()).delete()
+        Connection.query.filter_by(network_id=network_id,organization_B=organization.get_name()).delete()
+
         if not organization:  # If no organizstion exists with that name, then return error
             ret = {'msg': 'Organization not found in database'}
             return make_response(jsonify(ret), 400)
@@ -764,6 +770,11 @@ class DeleteServerGroup(Resource):
             return make_response(jsonify({"msg": "Forbidden" }), 403)
 
         server_group = ServerGroup.query.filter_by(id=id).first()
+
+        network_id = server_group.get_network_id()
+
+        Connection.query.filter_by(network_id=network_id,server_group_A=server_group.get_name()).delete()
+        Connection.query.filter_by(network_id=network_id,server_group_B=server_group.get_name()).delete()
 
         if not server_group:  # If no server group exists with that name, then return error
             ret = {'msg': 'Server group not found in database'}
