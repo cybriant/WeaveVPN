@@ -477,11 +477,16 @@ class DeleteNetwork(Resource):
 
         network = Network.query.filter_by(id=id).first()
 
+        Organization.query.filter_by(network_id=id).delete()
+        ServerGroup.query.filter_by(network_id=id).delete()
+        Connection.query.filter_by(network_id=id).delete()
+
         if not network:  # If no network exists with that name, then return error
             ret = {'msg': 'Network not found in database'}
             return make_response(jsonify(ret), 400)
 
         else:
+            # deletes the network and any organizations, server groups, and connections within the network
             db.session.delete(network)
             db.session.commit()
             ret = {'msg': 'Successfully deleted network'}
