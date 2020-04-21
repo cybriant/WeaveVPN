@@ -1,12 +1,21 @@
 # WeaveVPN
 
+Virtual Private Networks (VPNs) are an important tool in networking infrastructure and OpenVPN is the most
+prolific and robust open source framework for VPN connectivity. In theory, OpenVPN allows the set up of a
+Software Defined Network (SDN), connecting many different VPNs together. However in practice this is
+difficult to accomplish. WeaveVPN is a web based service for dynamically setting up and configuring an
+SDN, quickly, easily, and securely.
+
 # Technology Stack
 - Vue.js
-- Flask
+- Flask (Python)
 - MariaDB
+- Linux - CentOS
+- OpenVPN
+- OAuth2.0 Security Specification
 
 
-# Backend
+# How to Set Up Backend
 
 1. Change directory to Backend directory: 
    - `cd Backend`
@@ -25,7 +34,7 @@
 5. Create database and run development server: 
     - `python app.py`
 
-# Frontend
+# How to Set Up Frontend
 
 1. Change directory to Frontend directory: 
      - `cd Frontend`
