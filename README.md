@@ -20,18 +20,14 @@ SDN, quickly, easily, and securely.
 1. Change directory to Backend directory: 
    - `cd Backend`
 
-2. Activate Virtual Environment: 
-    - On Windows: `venv/Scripts/activate`
-    - On Unix or MacOS: `source venv/Scripts/activate`
-
-3. Install dependencies first from requirements.txt 
+2. Install dependencies first from requirements.txt 
     - Using Python: `pip install -r requirements.txt`
     - Using Python3: `pip3 install -r requirements.txt`
 
-4. Change directory to the Auth Server directory: 
+3. Change directory to the Auth Server directory: 
    - `cd auth_server`
 
-5. Create database and run development server: 
+4. Create database and run development server: 
     - `python app.py`
 
 # How to Set Up Frontend
