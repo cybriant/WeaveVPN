@@ -10,7 +10,6 @@
               <v-tab>Organizations</v-tab>
               <v-tab>Server Groups</v-tab>
               <v-tab>Connection Rules</v-tab>
-              <v-tab>Downloads</v-tab>
 
               <!-- ORGANIZATIONS TAB -->
 
@@ -206,13 +205,10 @@
                   sort-by="Name"
                   class="elevation-1"
                 >
-                  <template v-if="role === 'Administrator'" v-slot:item.action="{ item }">
-                    <v-icon
-                      class="mr-2"
-                      @click="editServerGroupItem(item)"
-                      title="Edit Server Group"
-                    >edit</v-icon>
-                    <v-icon @click="deleteServerGroupItem(item)" title="Delete Server Group">delete</v-icon>
+                  <template v-slot:item.action="{ item }">
+                    <v-icon class="mr-2" @click="downloadPackage()" title="Download Package">get_app</v-icon>
+                    <v-icon v-if="role === 'Administrator'" class="mr-2" @click="editServerGroupItem(item)" title="Edit Server Group">edit</v-icon>
+                    <v-icon v-if="role === 'Administrator'" @click="deleteServerGroupItem(item)" title="Delete Server Group">delete</v-icon>
                   </template>
                 </v-data-table>
               </v-tab-item>
@@ -348,17 +344,7 @@
 
               <!-- END OF CONNECTIONS TAB -->
 
-              <!-- DOWNLOADS TAB -->
-
-              <v-tab-item style="margin-top: 1rem;">
-
-                <div class="my-2">
-                  <v-btn @click="downloadPackage()" color="success" dark>Download Package<i class="fas fa-download" style="margin-left: 5px;"></i></v-btn>
-                </div>
-
-              </v-tab-item>
-
-              <!-- END OF DOWNLOADS TAB -->
+            
             </v-tabs>
           </card>
         </div>
