@@ -11,11 +11,11 @@ subprocess.call(["sudo", "openvpn", "--config", "./config.ovpn"])
 '''
 
 
-
 ''' 
 Commands to generate certificate and keys 
 Must be in the OpenVPN\easy-rsa folder to run commands
 Must have the cmd in admin mode
+All of this was runned on Windows
 '''
 
 #os.system('start /wait cmd /k "cd C:\Program Files\OpenVPN\easy-rsa"')
