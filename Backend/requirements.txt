@@ -3,5 +3,5 @@ Flask-SQLAlchemy
 flask-jwt-extended
 flask-cors
 Flask-RestPlus
-Werkzeug==0.16.1
+Werkzeug==3.0.1
 uuid
